@@ -701,7 +701,7 @@ public class BattleCalculator : Red
 
     public void ClassicBlackbelt()
     {
-        LoadState("basesaves/red/classicblackbelt.gqs");
+        LoadState("basesaves/red/blackbeltclassic.gqs");
         ClearText();
         LockThreshold = 0.000000001;
         Print = false;

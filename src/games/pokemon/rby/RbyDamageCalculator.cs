@@ -14,6 +14,11 @@ public partial class Rby {
         int attack = special ? attacker.Special : attacker.Attack;
         int defenseUnmodified = special ? defender.UnmodifiedSpecial : defender.UnmodifiedDefense;
         int defense = special ? defender.Special : defender.Defense;
+        if(attack > 0xff || defense > 0xff)
+        {
+            attack = Math.Max(attack >> 2, 1);
+            defense >>= 2;
+        }
 
         if(move.Name == "SELFDESTRUCT" || move.Name == "EXPLOSION") {
             defenseUnmodified = Math.Max(defenseUnmodified / 2, 1);
@@ -23,10 +28,10 @@ public partial class Rby {
         bool stab = attacker.Species.Type1 == move.Type || attacker.Species.Type2 == move.Type;
 
         int damage = ((attacker.Level * (crit ? 2 : 1)) & 0xff) * 2 / 5 + 2;
-        damage *= crit ? attackUnmodified : attack;
         damage *= move.Power;
-        damage /= 50;
+        damage *= crit ? attackUnmodified : attack;
         damage /= crit ? defenseUnmodified : defense;
+        damage /= 50;
         damage += 2;
         if(stab) damage = damage * 3 / 2;
         damage = damage * move.Game.GetTypeEffectiveness(move.Type, defender.Species.Type1) / 10;

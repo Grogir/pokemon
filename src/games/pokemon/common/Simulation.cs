@@ -5,6 +5,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 using static SimulationUtils;
+using System.Text.RegularExpressions;
 
 public class Simulation<Gb> where Gb : GameBoy
 {
@@ -29,15 +30,15 @@ public class Simulation<Gb> where Gb : GameBoy
     {
     }
 
-    public void Simulate(string title, byte[] state, Func<Gb, bool> scenario)
+    public List<double>[] Simulate(string title, byte[] state, Func<Gb, bool> scenario)
     {
         State = state;
-        Simulate(title, scenario);
+        return Simulate(title, scenario);
     }
 
-    public void Simulate(string title, string statePath, Func<Gb, bool> scenario)
+    public List<double>[] Simulate(string title, string statePath, Func<Gb, bool> scenario)
     {
-        Simulate(title, File.ReadAllBytes(statePath), scenario);
+        return Simulate(title, File.ReadAllBytes(statePath), scenario);
     }
 
     public Simulation<Gb> Track(params string[] variables)
@@ -60,7 +61,7 @@ public class Simulation<Gb> where Gb : GameBoy
         return this;
     }
 
-    public void Simulate(string title, Func<Gb, bool> scenario)
+    public List<double>[] Simulate(string title, Func<Gb, bool> scenario)
     {
         Trace.WriteLine(title);
         List<double>[] data = new List<double>[Variables.Count];
@@ -92,6 +93,7 @@ public class Simulation<Gb> where Gb : GameBoy
             byte[] state = gb.SaveState();
 
             for(int i = thread * Iterations / NumThreads; i < (thread + 1) * Iterations / NumThreads; ++i)
+            // int i = 241;
             {
                 // sf: 0x282 + 0x23c ; gsr: 0x1902 + 0x23c ; cpp: 0x3dd + 0x24b
                 state[0x3dd + 0x24b] = rngvalues[3 * i]; // rDIV
@@ -122,6 +124,7 @@ public class Simulation<Gb> where Gb : GameBoy
         for(int i = 0; i < Variables.Count; ++i)
             PrintResults(Variables[i].Item1, data[i]);
         Trace.WriteLine("");
+        return data;
     }
 }
 
@@ -129,16 +132,22 @@ public static class SimulationUtils
 {
     public static void PrintResults(string name, List<double> list)
     {
-        if(list.Count > 0)
+        if (list.Count > 0)
         {
             list.Sort();
-            Trace.WriteLine(name +
-                $"\n\tAverage: {list.Average()      :G5}" +
-                $"\n\tMedian:  {list[list.Count / 2]:G5}" +
-                $"\n\tStdev:   {Stdev(list)         :G5}" +
-                $"\n\tMin:     {list.Min()          :G5}" +
-                $"\n\tMax:     {list.Max()          :G5}"
-            );
+            if (name == "Success")
+                Trace.WriteLine(name +
+                    $"\n\tAverage: {list.Average():G5}" +
+                    $"\n\t50/24:   {Risk(list.Average()):G5}"
+                );
+            else
+                Trace.WriteLine(name +
+                    $"\n\tAverage: {list.Average():G5}" +
+                    $"\n\tMedian:  {list[list.Count / 2]:G5}" +
+                    $"\n\tStdev:   {Stdev(list):G5}" +
+                    $"\n\tMin:     {list.Min():G5}" +
+                    $"\n\tMax:     {list.Max():G5}"
+                );
         }
     }
 
@@ -148,19 +157,80 @@ public static class SimulationUtils
         return Math.Sqrt(list.Average(v => (v - avg) * (v - avg)));
     }
 
+    public static double Risk(double success)
+    {
+        return Math.Log(success) / Math.Log(0.50) * 24.0;
+    }
+
     public static void UseMove(this Rby gb, string move)
     {
-        if(gb.PC != 0x019C) gb.ClearText();
+        if (gb.PC != 0x019C) gb.ClearText();
         gb.BattleMenu(0, 0);
         gb.ChooseMenuItem(Array.IndexOf(gb.BattleMon.Moves, gb.Moves[move]));
         gb.ClearText(Joypad.None, int.MaxValue, 0x0f4696, 0x0f4700);
     }
 
-    public static void UseItem(this Rby gb, string item)
+    public static void UseItem(this Rby gb, string item, int target1 = -1, int target2 = -1)
     {
-        if(gb.PC != 0x019C) gb.ClearText();
+        if (gb.PC != 0x019C) gb.ClearText();
         gb.BattleMenu(0, 1);
         gb.ChooseListItem(gb.Bag.IndexOf(item));
+        if (target1 != -1) gb.ChooseMenuItem(target1);
+        if (target2 != -1)
+        {
+            gb.RunUntil("HandleMenuInput_.getJoypadState");
+            gb.ChooseMenuItem(target2);
+        }
         gb.ClearText(Joypad.None, int.MaxValue, 0x0f4696, 0x0f4700);
+    }
+    
+    public static void CombineSimulations(string file)
+    {
+        List<List<double>> trainers = new List<List<double>>();
+        foreach(string line in System.IO.File.ReadAllLines(file))
+        {
+            var m = Regex.Match(line, "([0-9]+): ([0-9.]+)%");
+            if(m.Success)
+            {
+                int hp = int.Parse(m.Groups[1].Value);
+                double pct = double.Parse(m.Groups[2].Value);
+                if(hp == 0) trainers.Add(new List<double>());
+                trainers.Last().Add(pct * 0.01);
+            }
+        }
+
+        List<double> Combine(List<double> trainer1, List<double> trainer2)
+        {
+            // int max = Math.Min(trainer1.Count, trainer2.Count);
+            int max = trainer1.Count;
+            List<double> combined = new List<double>(new double[max]);
+            for(int i = 0; i < trainer1.Count; ++i)
+            {
+                for(int j = 0; j < trainer2.Count; ++j)
+                {
+                    combined[Math.Min(i + j, max - 1)] += trainer1[i] * trainer2[j];
+                }
+            }
+            return combined;
+        }
+
+        // var combined = trainers[2];
+        // var combined = Combine(trainers[0], trainers[1]);
+        // var combined = Combine(Combine(trainers[0], trainers[1]), trainers[2]);
+        // var combined = Combine(trainers[3], trainers[4]);
+        // var combined = Combine(Combine(trainers[3], trainers[4]), trainers[6]);
+        var combined = Combine(Combine(Combine(Combine(Combine(trainers[0], trainers[1]), trainers[2]), trainers[3]), trainers[4]), trainers[6]);
+
+        double sum = 0;
+        double avg = 0;
+        int med = -1;
+        for(int i = 0; i < combined.Count; ++i)
+        {
+            Trace.WriteLine($"{i}: {100.0 * combined[i]:F3}%");
+            avg += i * combined[i];
+            sum += combined[i];
+            if(sum >= 0.5 && med == -1) med = i;
+        }
+        Trace.WriteLine($"Average: {avg:F5} Median: {med}");
     }
 }

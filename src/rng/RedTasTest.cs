@@ -64,11 +64,26 @@ public class RedTasTest : RedBlueForceComparisons
     {
         Record("bide");
         LoadState("basesaves/red/bide2.gqs");
+        CpuWriteBE<ushort>("wBattleMonSpeed", 13);
 
         RbyTurn.DefaultRoll = 1;
+        ForceTurn(new RbyTurn("BUBBLE", SideEffect), new RbyTurn("TACKLE", Miss));
         ForceTurn(new RbyTurn("BUBBLE", SideEffect), new RbyTurn("BIDE", 2 * Turns));
-        ForceTurn(new RbyTurn("BUBBLE", SideEffect), new RbyTurn("BIDE"));
-        ForceTurn(new RbyTurn("BUBBLE"), new RbyTurn("BIDE"));
+        ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("BIDE"), false);
+        ForceTurn(new RbyTurn("BUBBLE"), new RbyTurn("BIDE"), false, false);
+
+        // ForceTurn(new RbyTurn("BUBBLE", SideEffect), new RbyTurn("BIDE", 3 * Turns));
+        // ForceTurn(new RbyTurn("BUBBLE", SideEffect), new RbyTurn("BIDE"));
+        // ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("BIDE"), true);
+        // ForceTurn(new RbyTurn("BUBBLE"), new RbyTurn("BIDE"), false, false);
+
+        // ForceTurn(new RbyTurn("BUBBLE"));
+        // Yes();
+        // SendOut("NIDORANM");
+        // BattleSwitch("SQUIRTLE", new RbyTurn("BIDE", 3 * Turns));
+        // ForceTurn(new RbyTurn("POTION", "SQUIRTLE"), new RbyTurn("BIDE"));
+        // ForceTurn(new RbyTurn("BUBBLE"), new RbyTurn("BIDE"));
+        // ForceTurnAndSplit(new RbyTurn("BUBBLE"), new RbyTurn("BIDE"));
 
         AdvanceFrames(60);
         Dispose();
@@ -849,7 +864,7 @@ public class RedTasTest : RedBlueForceComparisons
 
     public RedTasTest() : base()
     {
-        Pathfinding();
+        Bide();
         Environment.Exit(0);
     }
 }

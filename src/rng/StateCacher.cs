@@ -23,7 +23,9 @@ public class StateCacher {
         ulong cc = gb.EmulatedSamples;
         TimeSpan time = TimeSpan.FromSeconds((double) cc / 2097152.0);
         // if(name=="end")
-        Console.WriteLine("{0}: {1} ({2:n0})", name, time.ToString(@"hh\:mm\:ss\.ff"), cc);
+        // Console.WriteLine("{0}: {1} ({2:n0})", name, time.ToString(@"hh\:mm\:ss\.fff"), cc);
+        System.Diagnostics.Trace.WriteLine(time.ToString(@"hh\:mm\:ss\.fff"));
+        // System.Diagnostics.Trace.WriteLine(name.Substring(0, 3) + " " + time.ToString(@"hh\:mm\:ss\.fff"));
     }
 
     public void ClearCache() {

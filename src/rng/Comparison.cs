@@ -24,7 +24,8 @@ public class Comparison
 
         for(int i = scenarios.Length - 1; i >= 0; --i)
         {
-            Gb.LoadState(states[i]);
+            if(states[i] != null)
+                Gb.LoadState(states[i]);
             timers[i] = new TimerComponent(0, 144 * ratio, 2.0f * ratio);
             if(video)
             {
@@ -37,7 +38,7 @@ public class Comparison
 
             scenarios[i]();
 
-            timers[i].Running = false;
+            timers[i].Stop();
             times[i] = timers[i].Duration().TotalSeconds;
             Gb.AdvanceFrames(wait);
             if(times[i] > longest)
@@ -64,6 +65,7 @@ public class Comparison
         }
 
         if(video && record) FFMPEG.RunFFMPEGCommand("-y " + movies + "-filter_complex hstack=inputs=" + scenarios.Length + " movies/" + name + ".mp4");
+        // if(video && record) FFMPEG.RunFFMPEGCommand("-y " + movies + "-c:v libx265 -filter_complex hstack=inputs=" + scenarios.Length + " movies/" + name + ".mp4");
     }
 
     public void Compare(string name, byte[] state, Scenario[] scenarios, bool video = true, bool record = true, int wait = 300, int ratio = 1)
@@ -84,30 +86,29 @@ public class Comparison
         Compare(name, statepath, scenarios, video, record, wait, ratio);
     }
 
-    public void Compare(string name, byte[] leftstate, byte[] rightstate, Scenario left, Scenario right, bool video = true, bool record = true, int wait = 300, int ratio = 1)
+    public void Compare(string name, byte[] leftstate, byte[] rightstate, params Scenario[] scenarios)
     {
-        Compare(name, new byte[][] { leftstate, rightstate }, new Scenario[] { left, right }, video, record, wait, ratio);
+        Compare(name, new byte[][] { leftstate, rightstate }, scenarios);
     }
 
-    public void Compare(string name, string leftpath, string rightpath, Scenario left, Scenario right, bool video = true, bool record = true, int wait = 300, int ratio = 1)
+    public void Compare(string name, string leftpath, string rightpath, params Scenario[] scenarios)
     {
-        Compare(name, File.ReadAllBytes(leftpath), File.ReadAllBytes(rightpath), left, right, video, record, wait, ratio);
+        Compare(name, File.ReadAllBytes(leftpath), File.ReadAllBytes(rightpath), scenarios);
     }
 
-    public void Compare(string name, byte[] state, Scenario left, Scenario right, bool video = true, bool record = true, int wait = 300, int ratio = 1)
+    public void Compare(string name, byte[] state, params Scenario[] scenarios)
     {
-        Compare(name, state, state, left, right, video, record, wait, ratio);
+        Compare(name, state, scenarios, true);
     }
 
-    public void Compare(string name, string statepath, Scenario left, Scenario right, bool video = true, bool record = true, int wait = 300, int ratio = 1)
+    public void Compare(string name, string statepath, params Scenario[] scenarios)
     {
-        Compare(name, File.ReadAllBytes(statepath), left, right, video, record, wait, ratio);
+        Compare(name, statepath, scenarios, true);
     }
 
-    public void Compare(string statepath, Scenario left, Scenario right, bool video = true, bool record = true, int wait = 300, int ratio = 1)
+    public void Compare(string statepath, params Scenario[] scenarios)
     {
-        string name = Regex.Match(statepath, @"([^/\\]+)\.gqs").Groups[1].Value;
-        Compare(name, statepath, left, right, video, record, wait, ratio);
+        Compare(statepath, scenarios, true);
     }
 }
 
@@ -194,6 +195,24 @@ public class RbyForceComparisons : RbyForce
         s.AddComponent(new RecordingComponent(movie));
         s.AddComponent(Timer);
         Timer.Running = start;
+    }
+
+    public void ScrollTo(string target)
+    {
+        ScrollTo(FindItem(target));
+    }
+
+    public void ScrollTo(int target)
+    {
+        OpenBag();
+        ListScroll(target, Joypad.B, true);
+        CurrentMenuType = MenuType.StartMenu;
+    }
+
+    public void Inventory()
+    {
+        for(int i = 0; i < Bag.NumItems; ++i)
+            System.Console.WriteLine((i + 1) + " " + Bag[i].Item + " x" + Bag[i].Quantity);
     }
 
     public RbyForceComparisons(string rom, SpeedupFlags speedupFlags) : base(rom, speedupFlags)

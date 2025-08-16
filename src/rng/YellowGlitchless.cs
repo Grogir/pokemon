@@ -2,6 +2,11 @@ public class YellowGlitchless : YellowForceComparisons
 {
     public YellowGlitchless()
     {
+        // ulong lasttime = 0;
+        // CallbackHandler.SetCallback(SYM["VBlank"], gb => {
+        //     if(gb.EmulatedSamples - lasttime > 40000) System.Diagnostics.Trace.WriteLine($"{gb.CpuRead("wPlayTimeMinutes"):d2}:{gb.CpuRead("wPlayTimeSeconds"):d2}.{gb.CpuRead("wPlayTimeFrames"):d2} " + (gb.EmulatedSamples - lasttime) + " +" + (float)(gb.EmulatedSamples - lasttime - SamplesPerFrame) / SamplesPerFrame);
+        //     lasttime = gb.EmulatedSamples;
+        // });
         // RecordAndTime("yellow-glitchless");
         RbyTurn.DefaultRoll = 20;
 
@@ -419,7 +424,7 @@ public class YellowGlitchless : YellowForceComparisons
             UseItem("TM28", "CHARMANDER");
 
             // BOAT RIVAL
-            MoveTo("SSAnne2F", 37, 8, Action.Up);
+            MoveTo("SSAnne2F", 36, 8, Action.Up);
             ClearText();
             ForceTurn(new RbyTurn("HORN ATTACK"));
             ForceTurn(new RbyTurn("BUBBLEBEAM"));
@@ -518,11 +523,11 @@ public class YellowGlitchless : YellowForceComparisons
 
             MoveTo(34, 19);
             UseItem("REPEL");
-            MoveTo(8, 10);
+            MoveTo(82, 11, 14);
             UseItem("REPEL");
 
             // HIKER
-            TalkTo(6, 10);
+            TalkTo(232, 6, 10);
             ForceTurn(new RbyTurn("BUBBLEBEAM", Crit));
             ForceTurn(new RbyTurn("BUBBLEBEAM"));
             ForceTurn(new RbyTurn("BUBBLEBEAM"));
@@ -1181,7 +1186,7 @@ public class YellowGlitchless : YellowForceComparisons
         // ClearCache();
         CacheState("end", () => {
             ClearText();
-            ClearText(Joypad.None, 26);
+            ClearText(26);
             AdvanceFrames(166);
         });
 

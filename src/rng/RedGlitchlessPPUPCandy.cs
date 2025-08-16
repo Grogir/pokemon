@@ -1,14 +1,14 @@
-public class RedGlitchlessWR : RedBlueForceComparisons
+public class RedGlitchlessPPUPCandy : RedBlueForceComparisons
 {
-    public RedGlitchlessWR()
+    public RedGlitchlessPPUPCandy(bool silphBar = true)
     {
-        // RecordAndTime("red-glitchless-wr");
-        RbyTurn.DefaultRoll = 20;
+        // RecordAndTime("red-glitchless-ppupcandy");
+        RbyTurn.DefaultRoll = 39;
 
         // ClearCache();
         CacheState("newgame", () => {
             new RbyIntroSequence(RbyStrat.NoPal, RbyStrat.GfSkip, RbyStrat.Hop0, RbyStrat.Title0).Execute(this);
-            Press(Joypad.Down | Joypad.A, Joypad.Left, Joypad.Down, Joypad.Right, Joypad.Start, Joypad.A); // Options
+            Press(Joypad.Down | Joypad.A, Joypad.Left, Joypad.Down, Joypad.Left, Joypad.B, Joypad.A); // Options
         });
 
         Timer.Start();
@@ -17,7 +17,6 @@ public class RedGlitchlessWR : RedBlueForceComparisons
         CacheState("rival1", () => {
             ClearText();
             Press(Joypad.A, Joypad.None, Joypad.A, Joypad.Start); // Name self
-
             ClearText();
             Press(Joypad.A, Joypad.None, Joypad.A, Joypad.Start); // Name rival
             ClearText(); // Journey begins!
@@ -30,32 +29,29 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             ClearText();
             Yes();
             Press(Joypad.None, Joypad.A, Joypad.Start); // Name Squirtle
-            ForceGiftDVs(0xaaaa);
+            ForceGiftDVs(0xe0ff);
             ClearText(); // Squirtle received
 
             MoveTo(5, 6);
             ClearText();
 
             // RIVAL1
-            ForceTurn(new RbyTurn("TAIL WHIP"), new RbyTurn("TACKLE"), false);
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("TACKLE"), false);
-            ForceTurn(new RbyTurn("TACKLE", Miss), new RbyTurn("TACKLE"), false);
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("TACKLE"), false);
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("GROWL", Miss), false);
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("TACKLE"), false);
+            ForceTurn(new RbyTurn("TAIL WHIP"), new RbyTurn("TACKLE"));
+            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("TACKLE"));
+            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("TACKLE"));
+            ForceTurn(new RbyTurn("TACKLE"));
             ClearText();
-            MoveTo(5, 10);
+            MoveTo(5, 10); // pathfinding doesnt like standing there (todo)
         });
 
         // ClearCache();
         CacheState("nidoran", () => {
             MoveTo("Route1", 11, 24);
             MoveTo("Route1", 13, 14);
-            MoveTo("Route1", 14, 13);
-            ForceEncounter(Action.Up, 1, 0x8888);
+            MoveTo("Route1", 14, 8);
+            ForceEncounter(Action.Up, 3, 0x0000);
             ClearText();
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("TACKLE"));
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("TACKLE", Crit));
+            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("TAIL WHIP"));
             ForceTurn(new RbyTurn("TACKLE"));
 
             MoveTo("ViridianCity", 21, 30);
@@ -69,17 +65,12 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             MoveTo("Route1", 16, 26);
             MoveTo("Route1", 14, 26);
             MoveTo("Route1", 14, 28);
-            MoveTo("Route1", 11, 28);
-            MoveTo("Route1", 11, 34);
-            ForceEncounter(Action.Down, 3, 0x8888);
-            RunAway();
+            MoveTo("Route1", 10, 28);
 
             TalkTo("OaksLab", 5, 2, Action.Right); // give parcel
 
             MoveTo("Route1", 11, 24);
-            MoveNpc(15, 13, Action.Left); // npc troll
             MoveTo("Route1", 13, 14);
-            MoveTo("Route1", 15, 4);
             MoveTo("ViridianCity", 21, 30);
 
             TalkTo("ViridianMart", 1, 5);
@@ -101,28 +92,26 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
         // ClearCache();
         CacheState("forest", () => {
-            Execute(SpacePath("DRRRRUUURRRRRRRRRRRRRRRRRRRURRUUUUUUUUUUUUUUUUUUUUUUUUUULUUUUULLLUUUUUUARRARRSUU"));
-            ForceEncounter(Action.Up, 4, 0x8888);
+            MoveNpc("ViridianCity", 13, 20, Action.Right);
+            MoveNpc("ViridianCity", 17, 5, Action.Right);
+            Execute(SpacePath("DRRUUURRRRRRRRRRRRRRRRRRRRRURUUUUUURUUUULUUUUUUAUUUUUUUUUUUUULLLUUUUUUUUUUURR"));
+            ForceEncounter(Action.Right, 4, 0x8cfa);
             ForceYoloball("POKE BALL");
             ClearText();
             No(); // pidgey caught
 
-            PickupItemAt("ViridianForest", 25, 11);
-            MoveTo(17, 16);
-            MoveTo(13, 3);
-            MoveTo(7, 22);
+            Execute(SpacePath("RUULLLLLUUURUUUUUUUUUUURRRRRURRRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU"));
+            PickupItem();
+            Execute(SpacePath("UUUALLLLLLLLDDDDDDDLLLLUUUUUUUUUUUUULLLLLLDDDDDDDDDDDDDDDDDDLDLLLLUU"));
 
             // WEEDLE GUY
-            PickupItemAt(1, 18);
-            MoveTo(1, 18);
-            ClearText();
-            ForceTurn(new RbyTurn("TAIL WHIP"), new RbyTurn("POISON STING"), false);
+            TalkTo("ViridianForest", 2, 18);
             ForceTurn(new RbyTurn("TAIL WHIP"), new RbyTurn("STRING SHOT"));
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("POISON STING"));
-            ForceTurn(new RbyTurn("TACKLE", Crit), new RbyTurn("STRING SHOT"));
+            ForceTurn(new RbyTurn("TAIL WHIP"), new RbyTurn("STRING SHOT"));
             ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("STRING SHOT"));
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("STRING SHOT", Miss));
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("STRING SHOT", Miss));
+            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("STRING SHOT"));
+            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("STRING SHOT"));
+            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("STRING SHOT"));
         });
 
         // ClearCache();
@@ -140,9 +129,9 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             ForceTurn(new RbyTurn("BUBBLE"));
             Yes();
             SendOut("NIDORANM");
-            BattleSwitch("SQUIRTLE", new RbyTurn("SCREECH", Miss));
+            BattleSwitch("SQUIRTLE", new RbyTurn("TACKLE"));
             ForceTurn(new RbyTurn("BUBBLE"), new RbyTurn("TACKLE"));
-            ForceTurnAndSplit(new RbyTurn("BUBBLE"), new RbyTurn("SCREECH"));
+            ForceTurnAndSplit(new RbyTurn("BUBBLE"), new RbyTurn("TACKLE"));
         });
 
         // ClearCache();
@@ -154,14 +143,14 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // BUG CATCHER 1
             MoveTo("Route3", 11, 6);
             ClearText();
-            ForceTurn(new RbyTurn("LEER"), new RbyTurn("TACKLE"), false);
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TACKLE", Miss), false);
-            ForceTurn(new RbyTurn("HORN ATTACK", 39));
-            ForceTurn(new RbyTurn("LEER"), new RbyTurn("POISON STING"), false);
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("POISON STING"), false);
+            ForceTurn(new RbyTurn("LEER"), new RbyTurn("TACKLE"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TACKLE"));
             ForceTurn(new RbyTurn("HORN ATTACK"));
             ForceTurn(new RbyTurn("LEER"), new RbyTurn("STRING SHOT"));
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TACKLE"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("STRING SHOT"));
+            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("STRING SHOT"));
+            ForceTurn(new RbyTurn("LEER"), new RbyTurn("STRING SHOT"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("STRING SHOT"));
             ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("STRING SHOT"));
 
             TossItem("ANTIDOTE");
@@ -170,32 +159,31 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // SHORTS GUY
             TalkTo(14, 4);
             ForceTurn(new RbyTurn("LEER"), new RbyTurn("TACKLE"));
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TAIL WHIP"));
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("QUICK ATTACK"));
-            ForceTurn(new RbyTurn("LEER"), new RbyTurn("POISON STING"));
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("POISON STING"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TACKLE"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TACKLE"));
+            ForceTurn(new RbyTurn("LEER"), new RbyTurn("LEER"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("LEER"));
             ForceTurn(new RbyTurn("HORN ATTACK"));
 
             // BUG CATCHER 2
             TalkTo(19, 5);
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("STRING SHOT"));
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("POISON STING"));
-            ForceTurn(new RbyTurn("HORN ATTACK", Crit), new RbyTurn("HARDEN"));
-            ForceTurn(new RbyTurn("HORN ATTACK"));
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("STRING SHOT"));
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("STRING SHOT", Miss));
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("HARDEN"), false);
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("HARDEN"), false);
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("POISON STING"));
+            ForceTurn(new RbyTurn("TACKLE"));
             ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("HARDEN"));
-            ForceTurn(new RbyTurn("TACKLE"), new RbyTurn("HARDEN"), false);
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("HARDEN"));
+            ForceTurn(new RbyTurn("TACKLE"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TACKLE"));
+            ForceTurn(new RbyTurn("HORN ATTACK"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("HARDEN"));
+            ForceTurn(new RbyTurn("HORN ATTACK"));
 
             // BUG CATCHER 3
             TalkTo(24, 6);
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TACKLE", Crit | 39));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TACKLE"));
             ForceTurn(new RbyTurn("HORN ATTACK"));
             ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("HARDEN"));
             ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("HARDEN"));
-            ForceTurn(new RbyTurn("HORN ATTACK", Crit));
+            ForceTurn(new RbyTurn("HORN ATTACK"));
 
             MoveTo(27, 11);
             SaveAndQuit();
@@ -226,7 +214,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             Execute(SpacePath("DRRDDDDDDDDDDRRRARRRRRRRRRRDR"));
             Execute(SpacePath("RRUUURARRRDDRRRRRUARURARRDDDDDDDDALLLLDDDDDDDADDLLLALLLLLLLLLLLLALLLLLLUUUUAUUALUUUUUUU"));
 
-            ForceEncounter(Action.Up, 5, 0x8888); // paras
+            ForceEncounter(Action.Up, 5, 0x0000); // paras
             ForceYoloball("POKE BALL");
             ClearText();
             No();
@@ -238,10 +226,9 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // MOON ROCKET
             MoveTo("MtMoonB2F", 11, 17);
             ClearText();
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("QUICK ATTACK"));
-            ForceTurn(new RbyTurn("HORN ATTACK", 39), new RbyTurn("TAIL WHIP"));
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("LEECH LIFE"));
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("LEECH LIFE"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TAIL WHIP"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TAIL WHIP"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("SUPERSONIC"));
             ForceTurn(new RbyTurn("HORN ATTACK"));
 
             // Moon menu
@@ -256,24 +243,15 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             TalkTo(12, 8);
             ForceTurn(new RbyTurn("MEGA PUNCH"), new RbyTurn("POUND"));
             ForceTurn(new RbyTurn("WATER GUN"));
-            ForceTurn(new RbyTurn("MEGA PUNCH"), new RbyTurn("TACKLE"));
-            ForceTurn(new RbyTurn("POISON STING"));
-            ForceTurn(new RbyTurn("MEGA PUNCH"), new RbyTurn("SMOG", Miss));
-            ForceTurn(new RbyTurn("MEGA PUNCH", Miss), new RbyTurn("SMOG"));
-            ForceTurn(new RbyTurn("MEGA PUNCH", Crit));
+            ForceTurn(new RbyTurn("MEGA PUNCH"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("TACKLE"));
+            ForceTurn(new RbyTurn("MEGA PUNCH"));
 
             TalkTo(13, 6);
             Yes();
             ClearText(); // helix fossil picked up
 
-            MoveTo(11, 4);
-            ForceEncounter(Action.Left, 0, 0x0000);
-            RunAway();
             MoveTo(3, 7);
-            ForceEncounter(Action.Right, 1, 0x0000);
-            ClearText();
-            ForceTurn(new RbyTurn("WATER GUN"));
-
             MoveTo("MtMoonB1F", 26, 3);
             MoveAndSplit(Joypad.Right);
         });
@@ -281,6 +259,8 @@ public class RedGlitchlessWR : RedBlueForceComparisons
         // ClearCache();
         CacheState("bridge", () => {
             AfterMoveAndSplit();
+            MoveNpc("CeruleanCity", 15, 18, Action.Down); // good npc
+            MoveTo("CeruleanCity", 14, 18);
             TalkTo("CeruleanPokecenter", 3, 2);
             Yes();
             ClearText(); // healed at center
@@ -296,11 +276,11 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
             // BRIDGE RIVAL
             ClearText();
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("GUST"));
             ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("QUICK ATTACK"));
-            ForceTurn(new RbyTurn("MEGA PUNCH"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("QUICK ATTACK"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("QUICK ATTACK"));
             ForceTurn(new RbyTurn("HORN ATTACK"));
-            ForceTurn(new RbyTurn("MEGA PUNCH"));
+            ForceTurn(new RbyTurn("MEGA PUNCH"), new RbyTurn("QUICK ATTACK"));
             ForceTurn(new RbyTurn("MEGA PUNCH"), new RbyTurn("VINE WHIP"));
             ForceTurn(new RbyTurn("HORN ATTACK"));
 
@@ -311,33 +291,31 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
             // LASS
             TalkTo(10, 28);
-            ForceTurn(new RbyTurn("MEGA PUNCH", Crit));
+            ForceTurn(new RbyTurn("MEGA PUNCH"));
             ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("SCRATCH"));
             ForceTurn(new RbyTurn("HORN ATTACK"));
 
             // YOUNGSTER
             TalkTo(11, 25);
+            ForceTurn(new RbyTurn("MEGA PUNCH"), new RbyTurn("QUICK ATTACK"));
             ForceTurn(new RbyTurn("MEGA PUNCH"));
             ForceTurn(new RbyTurn("MEGA PUNCH"));
-            ForceTurn(new RbyTurn("HORN ATTACK"));
 
             // LASS
             TalkTo(10, 22);
-            ForceTurn(new RbyTurn("MEGA PUNCH", 10), new RbyTurn("QUICK ATTACK"));
-            ForceTurn(new RbyTurn("POISON STING"));
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("POISON STING"));
+            ForceTurn(new RbyTurn("MEGA PUNCH"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("SCRATCH"));
             ForceTurn(new RbyTurn("HORN ATTACK"));
 
             // MANKEY GUY
             TalkTo(11, 19);
-            ForceTurn(new RbyTurn("MEGA PUNCH"), new RbyTurn("KARATE CHOP", Crit));
-            ForceTurn(new RbyTurn("POISON STING"));
+            ForceTurn(new RbyTurn("MEGA PUNCH"));
 
             // BRIDGE ROCKET
             MoveTo(10, 15);
             ClearText();
             ForceTurn(new RbyTurn("MEGA PUNCH"));
-            ForceTurnAndSplit(new RbyTurn("HORN ATTACK"));
+            ForceTurnAndSplit(new RbyTurn("MEGA PUNCH"));
         });
 
         // ClearCache();
@@ -347,29 +325,28 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // HIKER
             MoveTo("Route25", 14, 7);
             ClearText();
-            // MoveSwap("MEGA PUNCH", "WATER GUN");
+            MoveSwap("MEGA PUNCH", "WATER GUN");
             ForceTurn(new RbyTurn("WATER GUN"));
 
             // LASS
             TalkTo(18, 8, Action.Down);
             ForceTurn(new RbyTurn("MEGA PUNCH"));
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("SCRATCH", Crit));
-            ForceTurn(new RbyTurn("HORN ATTACK", Crit));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("SCRATCH"));
+            ForceTurn(new RbyTurn("HORN ATTACK"));
 
             // HIKER
             TalkTo(23, 9);
             ForceTurn(new RbyTurn("WATER GUN"));
             ForceTurn(new RbyTurn("WATER GUN"));
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("KARATE CHOP", Crit));
-            ForceTurn(new RbyTurn("POISON STING"));
+            ForceTurn(new RbyTurn("MEGA PUNCH"));
             ForceTurn(new RbyTurn("WATER GUN"));
 
             // ODDISH LASS
             TalkTo(37, 4);
             ForceTurn(new RbyTurn("MEGA PUNCH"));
             ForceTurn(new RbyTurn("HORN ATTACK"));
+            ForceTurn(new RbyTurn("MEGA PUNCH"));
             TeachLevelUpMove("WATER GUN");
-            ForceTurn(new RbyTurn("THRASH")); // faster than HA
 
             TalkTo("BillsHouse", 6, 5, Action.Right);
             Yes();
@@ -393,7 +370,6 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // DIG ROCKET
             MoveTo("CeruleanCity", 30, 9);
             ClearText();
-            ForceTurn(new RbyTurn("THRASH"), new RbyTurn("KARATE CHOP", Crit));
             ForceTurn(new RbyTurn("THRASH"));
             ForceTurn(new RbyTurn("THRASH"));
 
@@ -406,7 +382,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // MISTY
             TalkTo(4, 2);
             ForceTurn(new RbyTurn("THRASH"));
-            ForceTurn(new RbyTurn("THRASH", Crit), new RbyTurn("WATER GUN", 30));
+            ForceTurn(new RbyTurn("THRASH"), new RbyTurn("BUBBLEBEAM"));
             ForceTurnAndSplit(new RbyTurn("THRASH"));
         });
 
@@ -418,23 +394,23 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
             // FEMALE JR. TRAINER
             TalkTo(11, 30, Action.Down);
-            ForceTurn(new RbyTurn("THRASH"), new RbyTurn("QUICK ATTACK"));
             ForceTurn(new RbyTurn("THRASH"));
-            ForceTurn(new RbyTurn("THRASH"), new RbyTurn("QUICK ATTACK"));
+            ForceTurn(new RbyTurn("THRASH"));
+            ForceTurn(new RbyTurn("THRASH"));
 
             // MALE JR. TRAINER
             MoveTo(10, 31);
             ClearText();
             ForceTurn(new RbyTurn("THRASH"));
-            ForceTurn(new RbyTurn("THRASH"), new RbyTurn("QUICK ATTACK"));
+            ForceTurn(new RbyTurn("THRASH"));
 
             MoveTo("VermilionCity", 18, 30);
             ClearText();
 
             // BOAT RIVAL
-            MoveTo("SSAnne2F", 37, 8, Action.Up);
+            MoveTo("SSAnne2F", 36, 8, Action.Up);
             ClearText();
-            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("QUICK ATTACK"));
+            ForceTurn(new RbyTurn("HORN ATTACK"), new RbyTurn("GUST"));
             ForceTurn(new RbyTurn("HORN ATTACK"));
             ForceTurn(new RbyTurn("MEGA PUNCH"));
             ForceTurn(new RbyTurn("THRASH"));
@@ -442,12 +418,6 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             ForceTurn(new RbyTurn("THRASH"));
 
             TalkTo("SSAnneCaptainsRoom", 4, 2); // hm01 received
-
-            // GENTLEMAN
-            TalkTo(103, 0, 14);
-            ForceTurn(new RbyTurn("THRASH"));
-            ForceTurn(new RbyTurn("THRASH"));
-            PickupItemAt(0, 12);
 
             MoveTo("VermilionDock", 14, 2);
             ClearText();
@@ -458,12 +428,11 @@ public class RedGlitchlessWR : RedBlueForceComparisons
         CacheState("surge", () => {
             TalkTo("VermilionMart", 1, 5);
             Sell("TM34", 1, "NUGGET", 1);
-            Buy("REPEL", 6, "PARLYZ HEAL", 3);
+            Buy("REPEL", 6, "PARLYZ HEAL", 2);
 
             // Cut menu
             MoveTo("VermilionCity", 15, 17, Action.Down);
             UseItem("TM11", "NIDOKING", "POISON STING");
-            UseItem("RARE CANDY", "NIDOKING");
             UseItem("HM01", "PARAS");
             UseItem("TM28", "PARAS");
             Cut();
@@ -481,11 +450,9 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
             // SURGE
             TalkTo(5, 1);
-            ForceTurn(new RbyTurn("THRASH", ThreeTurn | Crit));
+            ForceTurn(new RbyTurn("THRASH"));
             ForceTurn(new RbyTurn("THRASH"), new RbyTurn("QUICK ATTACK"));
-            ForceTurn(new RbyTurn("THRASH"), new RbyTurn("GROWL"));
-            BattleSwitch("PIDGEY", new RbyTurn("THUNDERBOLT"));
-            SendOut("NIDOKING");
+            ForceTurn(new RbyTurn("THRASH"), new RbyTurn("THUNDERBOLT"));
             ForceTurnAndSplit(new RbyTurn("THRASH"));
         });
 
@@ -513,13 +480,13 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // 4 TURN THRASH GIRL
             TalkTo(13, 10);
             ForceTurn(new RbyTurn("MEGA PUNCH"));
-            ForceTurn(new RbyTurn("THRASH", Crit));
+            ForceTurn(new RbyTurn("THRASH"));
             ForceTurn(new RbyTurn("THRASH"));
             ForceTurn(new RbyTurn("THRASH"));
 
             // BUG CATCHER
             TalkTo(40, 8);
-            ForceTurn(new RbyTurn("THRASH", Crit));
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
             ForceTurn(new RbyTurn("THRASH"));
             ForceTurn(new RbyTurn("THRASH"));
 
@@ -550,18 +517,18 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
             MoveTo(34, 19);
             UseItem("REPEL");
-            MoveTo(8, 10);
+            MoveTo(82, 11, 14);
             UseItem("REPEL");
 
             // HIKER
-            TalkTo(6, 10);
+            TalkTo(232, 6, 10);
             ForceTurn(new RbyTurn("BUBBLEBEAM"));
             ForceTurn(new RbyTurn("BUBBLEBEAM"));
             ForceTurn(new RbyTurn("BUBBLEBEAM"));
 
             // PIDGEY GIRL
             TalkTo("RockTunnel1F", 22, 24);
-            ForceTurn(new RbyTurn("THRASH", Crit));
+            ForceTurn(new RbyTurn("THRASH"));
             ForceTurn(new RbyTurn("THRASH"));
             ForceTurn(new RbyTurn("THRASH"));
 
@@ -576,7 +543,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
             // GAMBLER
             TalkTo("Route8", 46, 13);
-            ForceTurn(new RbyTurn("THRASH"));
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
             ForceTurn(new RbyTurn("THRASH"));
 
             MoveTo("UndergroundPathWestEast", 47, 2);
@@ -606,11 +573,11 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             ClearText();
 
             TalkTo(12, 2, Action.Up);
-            ChooseMenuItem(1); // get soda pop
+            ChooseMenuItem(0); // get fresh water
             ClearText();
 
             TalkTo("CeladonMart5F", 5, 4);
-            Buy("X ACCURACY", 11, "X SPECIAL", 7, "X SPEED", 3);
+            Buy("X ACCURACY", 11, "X SPECIAL", 6, "X SPEED", 3);
 
             TalkTo("CeladonMartElevator", 3, 0);
             ChooseListItem(0);
@@ -651,7 +618,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
             // CHANNELER 1
             TalkTo("PokemonTower4F", 15, 7);
-            // MoveSwap("THRASH", "ROCK SLIDE");
+            MoveSwap("THRASH", "ROCK SLIDE");
             ForceTurn(new RbyTurn("ROCK SLIDE"));
             ForceTurn(new RbyTurn("ROCK SLIDE"));
 
@@ -683,7 +650,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // ROCKET 1
             MoveTo("PokemonTower7F", 10, 11);
             ClearText();
-            ForceTurn(new RbyTurn("THUNDERBOLT", Crit));
+            ForceTurn(new RbyTurn("THUNDERBOLT"));
             ForceTurn(new RbyTurn("THUNDERBOLT"));
             ForceTurn(new RbyTurn("THUNDERBOLT"));
 
@@ -700,7 +667,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             ForceTurn(new RbyTurn("THUNDERBOLT"));
             ForceTurn(new RbyTurn("THUNDERBOLT"));
             ForceTurn(new RbyTurn("THRASH"));
-            ForceTurn(new RbyTurn("THRASH", Crit));
+            ForceTurn(new RbyTurn("THRASH"));
 
             // Get Pokéflute
             TalkTo(10, 3);
@@ -728,42 +695,75 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
             PickupItemAt("SilphCo5F", 12, 3);
 
-            // ARBOK ROCKET
-            TalkTo(8, 16);
-            ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("LEER"));
-            ForceTurn(new RbyTurn("HORN DRILL"));
+            if(silphBar) {
+                // ARBOK ROCKET
+                TalkTo(8, 16);
+                ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("LEER"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
 
-            PickupItemAt(21, 16);
-            TalkTo(7, 13);
-            TalkTo("SilphCo3F", 17, 9);
+                PickupItemAt(21, 16);
+                TalkTo(7, 13);
+                TalkTo("SilphCo3F", 17, 9);
 
-            // SILPH RIVAL
-            MoveTo("SilphCo7F", 3, 2, Action.Left);
-            ClearText();
-            ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("WING ATTACK", 5));
-            ForceTurn(new RbyTurn("X SPEED"), new RbyTurn("WHIRLWIND"));
-            ForceTurn(new RbyTurn("HORN DRILL"));
-            ForceTurn(new RbyTurn("X SPECIAL"), new RbyTurn("HYDRO PUMP", 35));
-            ForceTurn(new RbyTurn("HORN DRILL"));
-            ForceTurn(new RbyTurn("BUBBLEBEAM"));
-            ForceTurn(new RbyTurn("HORN DRILL"));
-            ForceTurn(new RbyTurn("HORN DRILL"));
+                // SILPH RIVAL
+                MoveTo("SilphCo7F", 3, 2, Action.Left);
+                ClearText();
+                ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("WHIRLWIND"));
+                // ItemSwap("POTION", "RARE CANDY");
+                ForceTurn(new RbyTurn("X SPEED"), new RbyTurn("WHIRLWIND"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+                ForceTurn(new RbyTurn("X SPECIAL"), new RbyTurn("HYDRO PUMP"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+                ForceTurn(new RbyTurn("BUBBLEBEAM"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
 
-            MoveTo(5, 7, Action.Right);
-            UseItem("ELIXER", "NIDOKING");
+                MoveTo(5, 7, Action.Right);
+                UseItem("ELIXER", "NIDOKING");
 
-            // SILPH ROCKET
-            TalkTo("SilphCo11F", 3, 16);
-            ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("GROWL"));
-            ForceTurn(new RbyTurn("BUBBLEBEAM"));
-            ForceTurn(new RbyTurn("HORN DRILL"));
-            ForceTurn(new RbyTurn("HORN DRILL"));
+                // SILPH ROCKET
+                TalkTo("SilphCo11F", 3, 16);
+                ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("FOCUS ENERGY"));
+                ForceTurn(new RbyTurn("BUBBLEBEAM"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+            } else {
+                // ARBOK ROCKET
+                TalkTo(8, 16);
+                ForceTurn(new RbyTurn("THRASH"), new RbyTurn("LEER"));
+                ForceTurn(new RbyTurn("THRASH"));
+
+                PickupItemAt(21, 16);
+                TalkTo(7, 13);
+                TalkTo("SilphCo3F", 17, 9);
+
+                // SILPH RIVAL
+                MoveTo("SilphCo7F", 3, 2, Action.Left);
+                ClearText();
+                ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("WHIRLWIND"));
+                ForceTurn(new RbyTurn("X SPEED"), new RbyTurn("WHIRLWIND"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+
+                MoveTo(5, 7, Action.Right);
+
+                // SILPH ROCKET
+                TalkTo("SilphCo11F", 3, 16);
+                ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("FOCUS ENERGY"));
+                ForceTurn(new RbyTurn("BUBBLEBEAM"));
+                ForceTurn(new RbyTurn("ELIXER", "NIDOKING"), new RbyTurn("CONFUSION"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+                ForceTurn(new RbyTurn("HORN DRILL"));
+            }
 
             // SILPH GIOVANNI
             TalkTo(6, 13, Action.Up);
             MoveTo(6, 13);
             ClearText();
-            ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn(AiItem)); // Guard Spec
+            ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("HORN ATTACK"));
             ForceTurn(new RbyTurn("HORN DRILL"));
             ForceTurn(new RbyTurn("HORN DRILL"));
             ForceTurn(new RbyTurn("BUBBLEBEAM"));
@@ -787,17 +787,22 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // Snorlax menu
             MoveTo("Route16", 27, 10);
             UseItem("REPEL");
-            ItemSwap("PARLYZ HEAL", "RARE CANDY");
+            // ItemSwap("HELIX FOSSIL", "X SPECIAL");
+            ItemSwap("POTION", "RARE CANDY"); // alt
             UseItem("POKE FLUTE");
             RunAway();
 
-            PickupItemAt("Route17", 15, 14); // candy
+            MoveTo("Route17", 15, 5);
+            PickupItemAt("Route17", 15, 13); // candy
+            MoveTo("Route17", 17, 59);
+            PickupItemAt("Route17", 17, 71); // pp up
 
             // Post cycling menu
             MoveTo("Route18", 13, 7);
             MoveTo("Route18", 40, 8);
             UseItem("REPEL");
-            ItemSwap("POTION", "X SPECIAL");
+            ItemSwap("PARLYZ HEAL", "TM26");
+            UseItem("PP UP", "NIDOKING", "HORN DRILL");
             UseItem("TM26", "NIDOKING", "THRASH");
             UseItem("BICYCLE");
 
@@ -833,14 +838,14 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // MoveSwap("HORN DRILL", "EARTHQUAKE");
             ForceTurn(new RbyTurn("EARTHQUAKE"));
             ForceTurn(new RbyTurn("EARTHQUAKE"));
-            ForceTurn(new RbyTurn("EARTHQUAKE", Crit));
+            ForceTurn(new RbyTurn("EARTHQUAKE"));
             ForceTurn(new RbyTurn("EARTHQUAKE"));
 
             // JUGGLER 2
             MoveTo(1, 7);
             ClearText();
             ForceTurn(new RbyTurn("EARTHQUAKE"));
-            ForceTurn(new RbyTurn("EARTHQUAKE"), new RbyTurn("DISABLE", "EARTHQUAKE"));
+            ForceTurn(new RbyTurn("EARTHQUAKE"), new RbyTurn("POISON GAS"));
             ForceTurn(new RbyTurn("THUNDERBOLT"));
 
             // KOGA
@@ -848,30 +853,29 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             ForceTurn(new RbyTurn("EARTHQUAKE"));
             ForceTurn(new RbyTurn("EARTHQUAKE"));
             ForceTurn(new RbyTurn("EARTHQUAKE"));
-            ForceTurn(new RbyTurn("ELIXER", "NIDOKING"), new RbyTurn(AiItem)); // X Attack
-            ForceTurnAndSplit(new RbyTurn("X SPECIAL"), new RbyTurn("SELFDESTRUCT"));
+            ForceTurnAndSplit(new RbyTurn("ELIXER", "NIDOKING"), new RbyTurn("SELFDESTRUCT"));
         });
 
         // ClearCache();
         CacheState("erika", () => {
             ClearText();
 
-            // Candy menu
             MoveTo("FuchsiaCity", 5, 28);
-            UseItem("RARE CANDY", "NIDOKING");
-            UseItem("RARE CANDY", "NIDOKING");
-            UseItem("RARE CANDY", "NIDOKING");
             UseItem("BICYCLE");
 
             TalkTo("WardensHouse", 2, 3);
             MoveTo("FuchsiaCity", 27, 28);
-            MoveNpc("PalletTown", 3, 8, Action.Up); // good npc
+            MoveNpc("PalletTown", 3, 8, Action.Left); // good npc
             Fly("PalletTown");
 
             // Surf menu
             MoveTo(4, 17, Action.Right);
             UseItem("SUPER REPEL");
-            ItemSwap("HELIX FOSSIL", "X SPEED");
+            UseItem("RARE CANDY", "NIDOKING");
+            UseItem("RARE CANDY", "NIDOKING");
+            UseItem("RARE CANDY", "NIDOKING");
+            // ItemSwap("HM01", "X SPEED");
+            ItemSwap("HELIX FOSSIL", "X SPECIAL"); // alt
             UseItem("HM03", "SQUIRTLE");
             Surf();
 
@@ -904,7 +908,6 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // BEAUTY
             MoveTo(3, 4);
             ClearText();
-            ForceTurn(new RbyTurn("BLIZZARD", Miss), new RbyTurn("HYPNOSIS", Miss));
             ForceTurn(new RbyTurn("BLIZZARD"));
 
             // ERIKA
@@ -974,7 +977,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // COOLTRAINER
             MoveTo("ViridianGym", 15, 5);
             ClearText();
-            ForceTurn(new RbyTurn("EARTHQUAKE", Crit));
+            ForceTurn(new RbyTurn("EARTHQUAKE"));
 
             // BLACKBELT
             MoveTo(10, 4);
@@ -991,10 +994,10 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // GIOVANNI
             TalkTo("ViridianGym", 2, 1);
             ForceTurn(new RbyTurn("EARTHQUAKE"));
-            ForceTurn(new RbyTurn("EARTHQUAKE", Crit));
             ForceTurn(new RbyTurn("EARTHQUAKE"));
             ForceTurn(new RbyTurn("EARTHQUAKE"));
-            ForceTurnAndSplit(new RbyTurn("BLIZZARD", 30));
+            ForceTurn(new RbyTurn("EARTHQUAKE"));
+            ForceTurnAndSplit(new RbyTurn("BLIZZARD"));
         });
 
         // ClearCache();
@@ -1011,9 +1014,9 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             ForceTurn(new RbyTurn("X SPEED"), new RbyTurn("AGILITY"));
             ForceTurn(new RbyTurn("BLIZZARD"), new RbyTurn("AGILITY"));
             ForceTurn(new RbyTurn("BLIZZARD"));
-            ForceTurn(new RbyTurn("HORN DRILL"));
-            ForceTurn(new RbyTurn("HORN DRILL"));
-            ForceTurn(new RbyTurn("HORN DRILL"));
+            ForceTurn(new RbyTurn("THUNDERBOLT"));
+            ForceTurn(new RbyTurn("EARTHQUAKE"));
+            ForceTurn(new RbyTurn("EARTHQUAKE"));
             ForceTurn(new RbyTurn("HORN DRILL"));
 
             MoveTo("Route22Gate", 4, 2, Action.Up);
@@ -1031,9 +1034,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             MoveTo(10, 96, Action.Up);
             ClearText();
 
-            MoveTo(7, 90);
-            Press(Joypad.None, Joypad.Right, Joypad.None);
-            PickupItem(); // max ether
+            // skip max ether
 
             MoveTo(7, 85, Action.Up);
             ClearText();
@@ -1086,7 +1087,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             PushBoulder(Joypad.Down, 3);
             Execute("L D D");
             PushBoulder(Joypad.Right);
-            Execute("U");
+            Execute("U"); // todo
 
             MoveTo(21, 15, Action.Right);
             PushBoulder(Joypad.Right);
@@ -1095,7 +1096,6 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
             // VR menu
             Strength();
-            UseItem("MAX ETHER", "NIDOKING", "HORN DRILL");
             UseItem("SUPER REPEL");
             UseItem("BICYCLE");
 
@@ -1111,12 +1111,15 @@ public class RedGlitchlessWR : RedBlueForceComparisons
         CacheState("lorelei", () => {
             AfterMoveAndSplit();
             TalkTo("IndigoPlateauLobby", 15, 8, Action.Up);
-            Deposit("SQUIRTLE", "PIDGEY", "PARAS");
+            Deposit("SQUIRTLE", "PARAS");
 
             MoveTo("IndigoPlateauLobby", 8, 0);
+            PartySwap("NIDOKING", "PIDGEY");
 
             // LORELEI
             TalkTo("LoreleisRoom", 5, 2, Action.Right);
+            ForceTurn(new RbyTurn("GUST"), new RbyTurn("AURORA BEAM"));
+            SendOut("NIDOKING");
             ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("REST"));
             ForceTurn(new RbyTurn("HORN DRILL"));
             ForceTurn(new RbyTurn("HORN DRILL"));
@@ -1153,7 +1156,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             ForceTurn(new RbyTurn("X SPECIAL"), new RbyTurn("DREAM EATER"));
             ForceTurn(new RbyTurn("EARTHQUAKE"));
             ForceTurn(new RbyTurn("BLIZZARD"));
-            ForceTurn(new RbyTurn("EARTHQUAKE", Crit));
+            ForceTurn(new RbyTurn("EARTHQUAKE"));
             ForceTurn(new RbyTurn("EARTHQUAKE"));
             ForceTurnAndSplit(new RbyTurn("EARTHQUAKE"));
         });
@@ -1169,8 +1172,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
             // LANCE
             MoveTo("LancesRoom", 5, 1);
             ClearText();
-            ForceTurn(new RbyTurn("X SPECIAL"), new RbyTurn("HYDRO PUMP", Miss));
-            ForceTurn(new RbyTurn("EARTHQUAKE"), new RbyTurn("HYDRO PUMP", 2));
+            ForceTurn(new RbyTurn("X SPECIAL"), new RbyTurn("HYDRO PUMP"));
             ForceTurn(new RbyTurn("THUNDERBOLT"));
             ForceTurn(new RbyTurn("BLIZZARD"));
             ForceTurn(new RbyTurn("X SPEED"), new RbyTurn("AGILITY"));
@@ -1186,12 +1188,12 @@ public class RedGlitchlessWR : RedBlueForceComparisons
 
             // CHAMPION
             ClearText();
-            ForceTurn(new RbyTurn("X SPECIAL"), new RbyTurn("WHIRLWIND"));
-            ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("WHIRLWIND"));
+            ForceTurn(new RbyTurn("X SPECIAL"), new RbyTurn("MIRROR MOVE"));
+            ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("MIRROR MOVE"));
             ForceTurn(new RbyTurn("HORN DRILL"));
             ForceTurn(new RbyTurn("HORN DRILL"));
             ForceTurn(new RbyTurn("HORN DRILL"));
-            ForceTurn(new RbyTurn("THUNDERBOLT"));
+            ForceTurn(new RbyTurn("HORN DRILL"));
             ForceTurn(new RbyTurn("HORN DRILL"));
             ForceTurnAndSplit(new RbyTurn("HORN DRILL"));
         });
@@ -1199,7 +1201,7 @@ public class RedGlitchlessWR : RedBlueForceComparisons
         // ClearCache();
         CacheState("end", () => {
             ClearText();
-            ClearText(Joypad.None, 26);
+            ClearText(26);
             AdvanceFrames(164);
         });
 

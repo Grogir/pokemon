@@ -304,6 +304,11 @@ public class YellowComparisons : YellowForceComparisons
         Comparison.Compare("basesaves/yellow/dkvstackle.gqs", () =>
         {
             ClearText();
+            ForceTurn(new RbyTurn("HORN ATTACK", 30 | Crit), new RbyTurn("POISON STING", 20));
+            ForceTurn(new RbyTurn("DOUBLE KICK", 20), null, false, false);
+        }, () =>
+        {
+            ClearText();
             ForceTurn(new RbyTurn("HORN ATTACK", 20 | Crit), new RbyTurn("POISON STING", 20));
             ForceTurn(new RbyTurn("DOUBLE KICK", 20), null, false, false);
         }, () =>
@@ -494,12 +499,150 @@ public class YellowComparisons : YellowForceComparisons
             ForceTurn(new RbyTurn("THRASH"));
         });
     }
+    void Flybar()
+    {
+        void Flybar(bool cubone = false, bool slowpoke = false)
+        {
+            Press(Joypad.A);
+            ClearText();
+            ForceTurn(new RbyTurn("THRASH"));
+            ForceTurn(new RbyTurn("THRASH"));
+            ForceTurn(new RbyTurn("THRASH"));
+            ForceTurn(new RbyTurn("THRASH"));
+
+            // BUG CATCHER
+            TalkTo(40, 8);
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
+            ForceTurn(new RbyTurn("THRASH"));
+            ForceTurn(new RbyTurn("THRASH"));
+
+            MoveTo(21, 3, 10);
+            MoveTo(8, 18);
+            MoveTo("RockTunnel1F", 15, 4);
+            UseItem("REPEL");
+
+            // POKEMANIAC 1
+            TalkTo("RockTunnel1F", 23, 8);
+            if(cubone) ForceTurn(new RbyTurn("THUNDERBOLT"), new RbyTurn("BONE CLUB"));
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
+            if(slowpoke) {
+                ForceTurn(new RbyTurn("THRASH"), new RbyTurn("CONFUSION"));
+                ForceTurn(new RbyTurn("THRASH"));
+            }
+            else ForceTurn(new RbyTurn("THUNDERBOLT"));
+
+            // POKEMANIAC 2
+            TalkTo("RockTunnelB1F", 26, 30);
+            ForceTurn(new RbyTurn("THUNDERBOLT"));
+
+            // ODDISH GIRL
+            TalkTo(14, 28);
+            ForceTurn(new RbyTurn("THRASH"));
+            ForceTurn(new RbyTurn("THRASH"));
+
+            MoveTo(34, 19);
+            UseItem("REPEL");
+            MoveTo(82, 11, 14);
+            UseItem("REPEL");
+
+            // HIKER
+            TalkTo(232, 6, 10);
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
+
+            // PIDGEY GIRL
+            TalkTo("RockTunnel1F", 22, 24);
+            ForceTurn(new RbyTurn("THRASH"));
+            ForceTurn(new RbyTurn("THRASH"));
+            ForceTurn(new RbyTurn("THRASH"));
+
+            // GAMBLER
+            TalkTo("Route8", 46, 13);
+            MoveSwap("THRASH", "BUBBLEBEAM");
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
+            ForceTurn(new RbyTurn("THRASH"));
+
+            ushort hp = CpuReadBE<ushort>("wPartyMon1HP");
+            LoadState("basesaves/yellow/lavenderrival.gqs");
+            CpuWriteBE<ushort>("wPartyMon1HP", hp);
+
+            // LAVENDER RIVAL
+            MoveTo("PokemonTower2F", 15, 5);
+            ClearText();
+            ForceTurn(new RbyTurn("X ACCURACY"), new RbyTurn("MIRROR MOVE"));
+            ForceTurn(new RbyTurn("HORN DRILL"));
+            ForceTurn(new RbyTurn("HORN DRILL"));
+            ForceTurn(new RbyTurn("HORN DRILL"));
+            ForceTurn(new RbyTurn("HORN DRILL"));
+            ForceTurn(new RbyTurn("HORN DRILL"));
+
+            // CHANNELER 1
+            TalkTo("PokemonTower4F", 15, 7);
+            ForceTurn(new RbyTurn("ROCK SLIDE"));
+            ForceTurn(new RbyTurn("ROCK SLIDE"));
+        }
+        Comparison.Compare("flybary", "basesaves/yellow/4ttg.gqs", () =>
+        {
+            CpuWriteBE<ushort>("wPartyMon1HP", 5);
+            Flybar();
+        }, () =>
+        {
+            CpuWriteBE<ushort>("wPartyMon1HP", 31);
+            Flybar(true, false);
+        }, () =>
+        {
+            CpuWriteBE<ushort>("wPartyMon1HP", 23);
+            Flybar(false, true);
+        }, () =>
+        {
+            CpuWriteBE<ushort>("wPartyMon1HP", 23);
+            Flybar();
+        });
+    }
+    void PokeManiac()
+    {
+        Comparison.Compare("pokemaniac1y", "basesaves/yellow/pokemaniac1.gqs", () =>
+        {
+            CpuWriteBE<ushort>("wPartyMon1HP", 23);
+            ClearText();
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
+            ForceTurn(new RbyTurn("THRASH"), new RbyTurn("CONFUSION"));
+            ForceTurn(new RbyTurn("THRASH"));
+        }, () =>
+        {
+            CpuWriteBE<ushort>("wPartyMon1HP", 23);
+            ClearText();
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
+            ForceTurn(new RbyTurn("BUBBLEBEAM"), new RbyTurn("CONFUSION"));
+            ForceTurn(new RbyTurn("THUNDERBOLT"));
+        });
+        Comparison.Compare("pokemaniac1ycrit", "basesaves/yellow/pokemaniac1.gqs", () =>
+        {
+            CpuWriteBE<ushort>("wPartyMon1HP", 23);
+            ClearText();
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
+            ForceTurn(new RbyTurn("THRASH", Crit));
+            TalkTo("RockTunnelB1F", 26, 30);
+            ForceTurn(new RbyTurn("BUBBLEBEAM"), new RbyTurn("CONFUSION"));
+            ForceTurn(new RbyTurn("THUNDERBOLT"));
+        }, () =>
+        {
+            CpuWriteBE<ushort>("wPartyMon1HP", 23);
+            ClearText();
+            ForceTurn(new RbyTurn("BUBBLEBEAM"));
+            ForceTurn(new RbyTurn("BUBBLEBEAM", Crit), new RbyTurn("CONFUSION"));
+            ForceTurn(new RbyTurn("THUNDERBOLT"));
+            TalkTo("RockTunnelB1F", 26, 30);
+            ForceTurn(new RbyTurn("THUNDERBOLT"));
+        });
+    }
 
     Comparison Comparison;
     public YellowComparisons() : base()
     {
         Comparison = new Comparison(this);
-        FuchsiaMenu();
+        DKvsTackle();
         Environment.Exit(0);
     }
 }
