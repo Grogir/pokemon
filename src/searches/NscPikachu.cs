@@ -88,21 +88,22 @@ class NscPikachu
         gb.ClearText(Joypad.A, 2);
     }
 
-    static void Test()
+    public static void Test()
     {
-        BlueCb gb = new BlueCb();
-        byte[] state = System.IO.File.ReadAllBytes("basesaves/blue/manip/nscspeedtie.gqs");
-        // byte[] state = System.IO.File.ReadAllBytes("basesaves/blue/manip/nscmash.gqs");
+        Blue gb = new Blue();
+        // gb.Show();
+        // byte[] state = System.IO.File.ReadAllBytes("basesaves/blue/manip/nscspeedtie.gqs");
+        byte[] state = System.IO.File.ReadAllBytes("basesaves/blue/manip/nscmash.gqs");
         // byte[] state = System.IO.File.ReadAllBytes("basesaves/blue/manip/nsccrash.gqs");
-        for(int i = 0; i < 100; ++i)
+        for(int i = 0; i < 1000; ++i)
         {
             gb.LoadState(state);
             gb.AdvanceFrame();
             state = gb.SaveState();
             string igt = $"{gb.CpuRead("wPlayTimeMinutes"):d2}:{gb.CpuRead("wPlayTimeSeconds"):d2}.{gb.CpuRead("wPlayTimeFrames"):d2}";
             gb.AdvanceFrame(Joypad.A);
-            gb.Hold(Joypad.A, gb.SYM["ManualTextScroll"]); if(gb.BattleMon.HP == 19 && gb.EnemyMon.HP == 0) // test speedtie
-            // if(gb.RunUntil("JoypadOverworld", "WaitForTextScrollButtonPress") == gb.SYM["WaitForTextScrollButtonPress"]) // test mash
+            // gb.Hold(Joypad.A, gb.SYM["ManualTextScroll"]); if(gb.BattleMon.HP == 19 && gb.EnemyMon.HP == 0) // test speedtie
+            if(gb.RunUntil("JoypadOverworld", "WaitForTextScrollButtonPress") == gb.SYM["WaitForTextScrollButtonPress"]) // test mash
             // gb.AdvanceFrames(50); if(gb.Map.Id == 118) // test crash
                 Trace.WriteLine(igt + " success");
             else
@@ -229,46 +230,46 @@ class NscPikachu
         return 0;
     }
 
-    static string LogTurn(BlueCb gb)
-    {
-        byte move;
-        int addr;
-        string info = "";
-        if(gb.Hold(Joypad.A, "MainInBattleLoop.enemyMovesFirst", "MainInBattleLoop.playerMovesFirst") == gb.SYM["MainInBattleLoop.enemyMovesFirst"])
-        {
-            addr = gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.enemyMovesFirst"] + 0x11);
-            move = gb.CpuRead(gb.SYM["wEnemySelectedMove"]);
-            if(move > 0) info += " " + gb.Moves[move].Name;
-            if(addr == gb.SYM["MoveMissed"]) info += " Miss";
-            if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
-            gb.ClearText(Joypad.A, 99, gb.SYM["ExecutePlayerMove"]);
-            addr = gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.AIActionUsedEnemyFirst"] + 0xC);
-            move = gb.CpuRead(gb.SYM["wPlayerSelectedMove"]);
-            if(move > 0) info += ", " + gb.Moves[move].Name;
-            if(addr == gb.SYM["MoveMissed"]) info += " Miss";
-            if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
-        }
-        else
-        {
-            addr = gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.playerMovesFirst"] + 0x3);
-            move = gb.CpuRead(gb.SYM["wPlayerSelectedMove"]);
-            if(move > 0) info += " " + gb.Moves[move].Name;
-            if(addr == gb.SYM["MoveMissed"]) info += " Miss";
-            if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
-            if(gb.ClearText(Joypad.A, 99, gb.SYM["ExecuteEnemyMove"], gb.SYM["HandleEnemyMonFainted"]) == gb.SYM["ExecuteEnemyMove"])
-            {
-                move = gb.CpuRead(gb.SYM["wEnemySelectedMove"]);
-                if(move > 0) info += ", " + gb.Moves[move].Name;
-                gb.Hold(Joypad.B, gb.SYM["EnemyCanExecuteMove"] + 0x7);
-                addr = gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.playerMovesFirst"] + 0x27);
-                if(addr == gb.SYM["MoveMissed"]) info += " Miss";
-                if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
-            }
-        }
-        info += " [HP:" + gb.BattleMon.HP + ";" + gb.EnemyMon.HP + "]";
-        if(gb.BattleMon.Poisoned) info += " ***PSN***";
-        return info;
-    }
+    // static string LogTurn(BlueCb gb)
+    // {
+    //     byte move;
+    //     int addr;
+    //     string info = "";
+    //     if(gb.Hold(Joypad.A, "MainInBattleLoop.enemyMovesFirst", "MainInBattleLoop.playerMovesFirst") == gb.SYM["MainInBattleLoop.enemyMovesFirst"])
+    //     {
+    //         addr = gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.enemyMovesFirst"] + 0x11);
+    //         move = gb.CpuRead(gb.SYM["wEnemySelectedMove"]);
+    //         if(move > 0) info += " " + gb.Moves[move].Name;
+    //         if(addr == gb.SYM["MoveMissed"]) info += " Miss";
+    //         if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
+    //         gb.ClearText(Joypad.A, 99, gb.SYM["ExecutePlayerMove"]);
+    //         addr = gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.AIActionUsedEnemyFirst"] + 0xC);
+    //         move = gb.CpuRead(gb.SYM["wPlayerSelectedMove"]);
+    //         if(move > 0) info += ", " + gb.Moves[move].Name;
+    //         if(addr == gb.SYM["MoveMissed"]) info += " Miss";
+    //         if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
+    //     }
+    //     else
+    //     {
+    //         addr = gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.playerMovesFirst"] + 0x3);
+    //         move = gb.CpuRead(gb.SYM["wPlayerSelectedMove"]);
+    //         if(move > 0) info += " " + gb.Moves[move].Name;
+    //         if(addr == gb.SYM["MoveMissed"]) info += " Miss";
+    //         if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
+    //         if(gb.ClearText(Joypad.A, 99, gb.SYM["ExecuteEnemyMove"], gb.SYM["HandleEnemyMonFainted"]) == gb.SYM["ExecuteEnemyMove"])
+    //         {
+    //             move = gb.CpuRead(gb.SYM["wEnemySelectedMove"]);
+    //             if(move > 0) info += ", " + gb.Moves[move].Name;
+    //             gb.Hold(Joypad.B, gb.SYM["EnemyCanExecuteMove"] + 0x7);
+    //             addr = gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.playerMovesFirst"] + 0x27);
+    //             if(addr == gb.SYM["MoveMissed"]) info += " Miss";
+    //             if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
+    //         }
+    //     }
+    //     info += " [HP:" + gb.BattleMon.HP + ";" + gb.EnemyMon.HP + "]";
+    //     if(gb.BattleMon.Poisoned) info += " ***PSN***";
+    //     return info;
+    // }
 
     public static void SearchBC1(int numThreads = 25, int numFrames = 60, int path = 1, string npc = "")
     {

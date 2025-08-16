@@ -10,7 +10,8 @@ class Clefairy
 {
     public static void Check()
     {
-        string state = "basesaves/red/manip/clefairysq.gqs";
+        // string state = "basesaves/red/manip/clefairysq.gqs";
+        string state = "basesaves/red/manip/clefairypa.gqs";
 
         // bool DoublePotionBackout(Red gb)
         // {
@@ -40,8 +41,9 @@ class Clefairy
         // string path = "S_BS_BDDDDUS_BUUUS_BLR"; //3239 119 (62 00f0)
         // string path = "S_BS_BLS_BLRRDDDUUS_BU"; //3239 119 (60 feee)
         // string path = "S_BS_BLS_BLRRDDUULS_BR"; //3239 119 (60 feee)
-        CheckIGT(state, new RbyIntroSequence(RbyStrat.NoPal), path, "CLEFAIRY", 3600, true, false, Verbosity.Summary, false, -1, ItemBackoutSelect);
-        CheckIGT(state, new RbyIntroSequence(RbyStrat.NoPal), path, "CLEFAIRY", 3600, true, false, Verbosity.Summary, true, -1, PotionBackoutSelect);
+        // CheckIGT(state, new RbyIntroSequence(RbyStrat.NoPal), path, "CLEFAIRY", 3600, true, false, Verbosity.Summary, false, -1, ItemBackoutSelect);
+        // CheckIGT(state, new RbyIntroSequence(RbyStrat.NoPal), path, "CLEFAIRY", 3600, true, false, Verbosity.Summary, true, -1, PotionBackoutSelect);
+        CheckIGT(state, new RbyIntroSequence(RbyStrat.NoPal), path, "CLEFAIRY", 60, true);
 
         // string path = "S_BS_BADDDDDDUAUS_BUAUUU"; //3360 60
         // string path = "S_BS_BADDDDDDUAUS_BAUUUU"; //3360 60

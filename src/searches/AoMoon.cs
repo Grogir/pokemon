@@ -82,8 +82,7 @@ class AoMoon
                 (gb.Maps[59][ 3,  2], gb.PickupItem)
             ) == gb.OverworldLoopAddress;
         });
-        for(int i = 0; i < 60; ++i) if(igt[i].Success) Trace.WriteLine(igt[i].IGTFrame + " " + igt[i].HRA + " " + igt[i].HRS + " " + igt[i].Divider + " " + igt[i].Dsum);
-        Trace.WriteLine(igt.TotalSuccesses + "/60 " + RNGSuccesses(igt));
+        RNGDebug(igt);
     }
 
     public static void Search(RbyIntroSequence intro, int numThreads = 16, int numFrames = 60)
@@ -111,9 +110,7 @@ class AoMoon
 
         if(numThreads == 1) gb.Show();
 
-        for(int i = 0; i < states.Length; ++i) Trace.WriteLine(states[i].IGTFrame + " " + states[i].HRA + " " + states[i].HRS + " " + states[i].Divider + " " + states[i].Dsum);
-        Trace.WriteLine(states.TotalSuccesses + "/60 " + RNGSuccesses(states));
-        // return;
+        // RNGDebug(states); return;
 
         Action actions = Action.Right | Action.Down | Action.Up | Action.Left | Action.A;
         RbyTile startTile = gb.Tile;
@@ -151,7 +148,7 @@ class AoMoon
         moon1[4, 2].GetEdge(4, Action.Left).NextEdgeset = 5;
         moon1[2, 4].RemoveEdge(4, Action.A);
         moon1[2, 4].GetEdge(4, Action.Up).NextEdgeset = 5;
-        Pathfinding.GenerateEdges<RbyMap, RbyTile>(gb, 5,  moon3[10, 17], actions, moon3[33, 23], moon3[34, 23], moon3[35, 23], moon3[36, 23]);
+        Pathfinding.GenerateEdges<RbyMap, RbyTile>(gb, 5, moon3[10, 17], actions, moon3[33, 23], moon3[34, 23], moon3[35, 23], moon3[36, 23]);
         moon1[3, 2].RemoveEdge(5, Action.A);
         moon1[2, 3].RemoveEdge(5, Action.A);
         // Pathfinding.DebugDrawEdges(gb, moon3, 5);
@@ -187,20 +184,14 @@ class AoMoon
             LogStart = startTile.PokeworldLink + "/",
             FoundCallback = state =>
             {
-                Path p = new Path(state.Log, state.IGT.TotalSuccesses, state.WastedFrames, RNGSuccesses(state.IGT));
+                Path p = new Path(state.Log, state.IGT.TotalSuccesses, state.WastedFrames, RNGSummary(state.IGT));
                 Trace.WriteLine(p);
                 results.Add(p);
             }
         };
 
         DepthFirstSearch.StartSearch(gbs, parameters, startTile, 5, states);
-
         results.CleanPrintAll();
         Elapsed("search");
-    }
-
-    static string RNGSuccesses(IGTResults igt)
-    {
-        return igt.RNGSuccesses(0) + "--" + igt.RNGSuccesses(1) + "-" + igt.RNGSuccesses(2) + "--" + igt.RNGSuccesses(3) + "-" + igt.RNGSuccesses(4) + "-" + igt.RNGSuccesses(5);
     }
 }

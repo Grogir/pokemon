@@ -30,8 +30,9 @@ class CheckIGT
         RbyIntroSequence intro = new RbyIntroSequence(RbyStrat.NoPal);
 
         string poy = "DDDDDDDDDDDARRRRRRRRRRRRRRRRD";
-        // poy += "UUURRRRRDDRRRRRRRUURRRDDDDDDDDLLDDDDDDDDDLLLLLLLLLLLLLLLLLLLLLLLUUUALUUUUUUUUUUU";
-        poy += "UUURRRRRDDRRRRRRRUURRRDDDDDDDDDDLLDDDDDDDLLLLLLLLLLLLLLLLLLLLLLLUUUALUUUUUUUUUUU"; // late turn
+        poy += "UUURRRRRDDRRRRRRRUURRRDDDDDDDDLLDDDDDDDDDLLLLLLLLLLLLLLLLLLLLLLLUUUALUUUUUUUUUUU";
+        // poy += "UUURRRRRDDRRRRRRRUURRRDDDDDDDDDDLLDDDDDDDLLLLLLLLLLLLLLLLLLLLLLLUUUALUUUUUUUUUUU"; // late turn
+        // string poy = "DDDDDDDDDDDADRRRRRRRRRRRRRRRRUUURRRRRDDRRRRRRRUURRRDDDDDDDDLLLLDDDDDDDDDLLLLLLLLLLLLLLLLLLLLLUUUUULUUUUUUUUU";
         CheckIGT("basesaves/red/manip/posthiker.gqs", intro, poy, "PARAS", 3600, false, true);
         CheckIGT("basesaves/red/manip/posthiker_redbar.gqs", intro, poy, "PARAS", 3600, false, true);
 
@@ -43,8 +44,8 @@ class CheckIGT
 
     public static void Rt3Moon()
     {
-        string rt3Moon = "RRRRRRRRURRUUUUUARRRRRRRRRRRRDDDDDRRRRRRRARUURRUUUUUUUUUURRRRUUUUUUUUUURRRRRU";
-        // string rt3Moon = "RRRRRRRURRRUUUUUARRRRRRRRRRRRDDDDDRRRRRRRARUURRUUUUUUUUUURRRRUUUUUUUUUURRRRRU"; // 1 early
+        // string rt3Moon = "RRRRRRRRURRUUUUUARRRRRRRRRRRRDDDDDRRRRRRRARUURRUUUUUUUUUURRRRUUUUUUUUUURRRRRU";
+        string rt3Moon = "RRRRRRRURRRUUUUUARRRRRRRRRRRRDDDDDRRRRRRRARUURRUUUUUUUUUURRRRUUUUUUUUUURRRRRU"; // 1 early
         rt3Moon += "UUUUUULLLLLALLLLDD";
         rt3Moon += "RRRRUURRRARRUUUUUUURRRRRRRAUUUUUUURRRDRDDDDDDDADDDDDDDDADRRRRRURRRR";
         rt3Moon += "UUUUUUUUR";
@@ -79,7 +80,7 @@ class CheckIGT
         // rt3Moon += "RRUUURARRRDDRRRRRUARURARRDDDDDDDDALLLLDDDDDDDADDLLLLALLLLLLLLLLLALLLLLLUUUUAUUALUUUUUUUU"; // 6 1 late
         // rt3Moon += "RRUUURARRRDDRRRRRUARURARRDDDDDDDDALLLLDDDDDDDADDLLLALLLLLLLLLLLLALLLLLLUUUUAUUALUUUUUUDD"; // clef mvt
         RbyIntroSequence rt3MoonIntro = new RbyIntroSequence(RbyStrat.PalHold);
-        CheckIGT("basesaves/red/manip/rt3moon.gqs", rt3MoonIntro, rt3Moon, "PARAS", 3600);
+        CheckIGT("basesaves/red/manip/rt3moon.gqs", rt3MoonIntro, rt3Moon, "PARAS", 60, true);
     }
 
     public static void Rt3MoonBackups(int frame = 36)
@@ -139,10 +140,10 @@ class CheckIGT
         CheckIGT("basesaves/red/manip/rt3moon_slot2.gqs", rt3MoonIntro, rt3Moon, "PARAS", 60, false, false, RbyIGTChecker<Red>.Verbosity.Full, false, -1, memeBall, 54, 60); // yoloball igt
         CheckIGT("basesaves/red/manip/rt3moon_slot2.gqs", rt3MoonIntro, rt3Moon, "PARAS", 60, false, false, RbyIGTChecker<Red>.Verbosity.Full, false, -1, memeBall, 0, 1); // normal igt
         // return;
-        for(ushort h = 7; h <= 41; ++h)
+        for(ushort hp = 7; hp <= 41; ++hp)
         {
             Trace.WriteLine("");
-            Trace.WriteLine(h);
+            Trace.WriteLine(hp);
             Red[] gbs = MultiThread.MakeThreads<Red>(16);
             gbs[0].LoadState("basesaves/red/manip/rt3moon_slot2.gqs");
             // gbs[0].Show();
@@ -156,7 +157,7 @@ class CheckIGT
                 gb.CpuWrite("wPlayTimeSeconds", (byte)(0));
                 gb.CpuWrite("wPlayTimeFrames", (byte)(i));
                 rt3MoonIntro.ExecuteAfterIGT(gb);
-                gb.CpuWriteBE<ushort>("wPartyMon1HP", h);
+                gb.CpuWriteBE<ushort>("wPartyMon1HP", hp);
                 gb.Execute(SpacePath(rt3Moon),
                     (gb.Maps[59][ 5, 31], gb.PickupItem),
                     (gb.Maps[59][34, 31], gb.PickupItem),
@@ -164,63 +165,22 @@ class CheckIGT
                     (gb.Maps[61][28,  5], gb.PickupItem),
                     (gb.Maps[59][ 2,  3], gb.PickupItem),
                     (gb.Maps[59][ 3,  2], gb.PickupItem));
-                // gb.SaveState("37hp.gqs");
                 if(gb.EnemyMon.Species.Name != "PARAS") return;
-                // gbs[0].Record("test");
                 gb.RunUntil("WaitForTextScrollButtonPress");
                 gb.AdvanceFrames(1); // missing textbox
                 gb.Press(Joypad.B);
                 gb.RunUntil("HandleMenuInput");
                 gb.Press(Joypad.A | Joypad.Down, Joypad.A | Joypad.Down | Joypad.Right);
-                // bool[] res = new bool[20];
                 if(gb.Hold(Joypad.A, "ItemUseBall.captured", "ItemUseBall.failedToCapture") == gb.SYM["ItemUseBall.captured"]) return;
                 gb.ClearText(Joypad.B);
                 if(gb.BattleMon.HP == 0) return;
                 gb.Press(Joypad.A);
-                byte[] ballstate = gb.SaveState();
-                for(int a = 0; a <= 4; ++a)
-                {
-                    for(int b = 0; b <= 4; ++b)
-                    {
-                        if(b == 0 && a != 0) continue;
-                        for(int c = 8; c <= 9; ++c)
-                        {
-                            gb.LoadState(ballstate);
-                            void Backout(int n)
-                            {
-                                if(n == 1) gb.Press(Joypad.B | Joypad.Right, Joypad.A);
-                                else if(n == 2) gb.Press(Joypad.Select, Joypad.B, Joypad.A);
-                                else if(n == 3) gb.Press(Joypad.A | Joypad.Up, Joypad.B);
-                                else if(n == 4) gb.Press(Joypad.Select, Joypad.A | Joypad.Up, Joypad.B);
-                            }
-                            string trad(int n)
-                            {
-                                if(n == 1) return "i  ";
-                                else if(n == 2) return "si ";
-                                else if(n == 3) return "p  ";
-                                else if(n == 4) return "sp ";
-                                else if(n == 8) return "b  ";
-                                else if(n == 9) return "sb ";
-                                return "";
-                            }
-                            Backout(a);
-                            Backout(b);
-                            gb.RunUntil("HandleMenuInput_.getJoypadState");
-                            if(c == 9) gb.Press(Joypad.Select);
-                            gb.Press(Joypad.A | (gb.CpuRead("wCurrentMenuItem") == 0 ? Joypad.Down : Joypad.Left));
-                            bool res = false;
-                            if(gb.Hold(Joypad.A, "ItemUseBall.captured", "ItemUseBall.failedToCapture") == gb.SYM["ItemUseBall.captured"])
-                                res = true;
-                            lock(results) {
-                                string str = trad(a) + trad(b) + trad(c);
-                                results.TryAdd(str, 0);
-                                if(res) results[str]++;
-                            }
-                            // Trace.WriteLine(a + " " + b + " " + c + ": " + res);
-                            // gb.AdvanceFrames(60);
-                        }
+                SearchCommon.FindYoloball(gb, (info, success) => {
+                    lock(results) {
+                        results.TryAdd(info, 0);
+                        if(success) results[info]++;
                     }
-                }
+                });
             });
             foreach(var r in results)
             {
@@ -438,67 +398,24 @@ class CheckIGT
         gb.Dispose();
     }
 
-    public static void Cans(RbyIntroSequence intro = null, string path = null)
+    public static void ChillMoon()
     {
-        intro = new RbyIntroSequence(RbyStrat.NoPal);
-        // intro = new RbyIntroSequence(RbyStrat.PalHold); // 60 igt (57)
-        // intro = new RbyIntroSequence(RbyStrat.NoPalAB, RbyStrat.GfSkip, RbyStrat.Hop0, 1); // 60 igt (57)
-        // intro = new RbyIntroSequence(RbyStrat.PalAB);
-        // intro = new RbyIntroSequence(RbyStrat.Pal, RbyStrat.GfSkip, RbyStrat.Hop0, 1); // 59
-
-        path = "SDALLLAURAUUUUUA"; // 60 cans - 3596/3600
-        // path = "LLURUUUUUA"; // 59 cans - 3539/3600
-        // path = "DALLLAURUUUUUA"; // 58 cans - 3477/3600
-        // path = "DLLLURUUUUUA"; // 57 cans - 3420/3600
-        // path = "DLLLU"+"RUUUUULUUUUUUURDA"; // xd
-        // path = "DDLLLUURUUUUUA"; // fail 57 - 3419
-        // path = "DDALLLUURUUUUUA"; // fail 58 - 3361
-        // path = "DDLALLUURUUUUUA"; // fail 58 - 3361
-        // path = "DLLLURRRRRUUUUUA"; // 60 igt (PalAB)
-
-        int numFrames = 60*60;
-        int numThreads = 16;
-
-        Red[] gbs = MultiThread.MakeThreads<Red>(numThreads);
-        Red gb = gbs[0];
-
-        gb.LoadState("basesaves/red/manip/cans.gqs");
-        gb.HardReset();
-        if(numThreads == 1)
-            gb.Record("test");
-        intro.ExecuteUntilIGT(gb);
-        byte[] igtState = gb.SaveState();
-
-        var full = new List<string>();
-        var results = new Dictionary<(byte first, byte second), int>();
-
-        MultiThread.For(numFrames, gbs, (gb, f) =>
-        {
-            gb.LoadState(igtState);
-            gb.CpuWrite("wPlayTimeSeconds", (byte) (f / 60));
-            gb.CpuWrite("wPlayTimeFrames", (byte) (f % 60));
-            // gb.CpuWrite("wPlayTimeMinutes", (byte) (f % 60));
-            // gb.CpuWrite("wPlayTimeSeconds", (byte) (54 + 3*(f / 2)));
-            // gb.CpuWrite("wPlayTimeFrames", (byte) (36 + f % 2));
-
-            intro.ExecuteAfterIGT(gb);
-            gb.Execute(SpacePath(path));
-
-            (byte first, byte second) cans = (gb.CpuRead("wFirstLockTrashCanIndex"), gb.CpuRead("wSecondLockTrashCanIndex"));
-            lock(results)
-            {
-                full.Add($"{f / 60,2} {f % 60,2}: {cans.first},{cans.second}");
-                if(!results.ContainsKey(cans))
-                    results.Add(cans, 1);
-                else
-                    results[cans]++;
-            }
+        string moon = "UUUUUUUUUUUUURRRRRRRUUUUUUUURRRRARRRRRRUUUUUUUUUUULLLLLLLDDDDLLLLLLLDDDD";
+        moon += "DLALLALLALLALD";
+        moon += "RARRUUULUR";
+        moon += "DDDDLLL";
+        moon += "URARRARRARRARU";
+        moon += "DDDDDDLLLALLALLLLLUUUUUUUUUUUULL";
+        moon += "DDDDDDDDDDDRRRRRRRRRRRRRRRRD";
+        moon += "UUURRRARRRDDRRRRRRUURRARDDDDDDDDLLLLDDDDDDDDDLLLALLLLLLLLLLLLLLLLLLLUUUUUUUUUUUUUU";
+        RbyIntroSequence intro = new RbyIntroSequence(RbyStrat.NoPal);
+        // CheckIGT("basesaves/red/manip/chillmoon.gqs", intro, moon, "", 60);
+        CheckIGT(new CheckIGTParameters() {
+            StatePath = "basesaves/red/manip/chillmoon.gqs",
+            Intro = intro,
+            Path = moon,
+            NumFrames = 60,
+            MemeBall = gb => false
         });
-        full.Sort();
-        foreach(string line in full)
-            Trace.WriteLine(line);
-        Trace.WriteLine("");
-        foreach(var cans in results)
-            Trace.WriteLine(cans.Key.first + "," + cans.Key.second + ": " + cans.Value);
     }
 }

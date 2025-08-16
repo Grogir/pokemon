@@ -175,10 +175,10 @@ class YellowNsc
             Path = BasePath + "LLDDDDADDADDADDADDDDARDDALDDDLLLLAUULAUU",
             NumFrames = 3,
             StartFrame = 52,
-            Minutes = 60,
+            Seconds = 60,
             // StatePath = State, MemeBall = Select, NameLength = 1,
-            // StatePath = StateR4, MemeBall = Down, NameLength = 1,
-            StatePath = StateP4, MemeBall = Select, NameLength = 7,
+            StatePath = StateR4, MemeBall = Down, NameLength = 1,
+            // StatePath = StateP4, MemeBall = Select, NameLength = 7,
         };
         CheckIGT(p);
     }
@@ -219,13 +219,13 @@ class YellowNsc
                             p.NameLength = name;
                             p.StartFrame = f2;
                             p.NumFrames = 1;
-                            p.Minutes = 20;
+                            p.Seconds = 20;
                             p.FullResults = null;
                             if(CheckIGT(p) >= 5)
                             {
                                 p.StartFrame = f1;
                                 p.NumFrames = 3;
-                                p.Minutes = 60;
+                                p.Seconds = 60;
                                 p.FullResults = new List<IGTResult>();
                                 int total = CheckIGT(p);
                                 int clusters = 0;

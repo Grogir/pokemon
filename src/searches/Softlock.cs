@@ -9,6 +9,25 @@ using static RbyIGTChecker<Red>;
 
 class Softlock
 {
+    public static void Any()
+    {
+        RedCb gb = new RedCb();
+        gb.Record("test");
+        gb.CallbackHandler.SetCallback(gb.SYM["VBlank"], gb => {
+            Trace.WriteLine($"{gb.EmulatedSamples} {gb.CpuRead("wPlayTimeMinutes"):d2}:{gb.CpuRead("wPlayTimeSeconds"):d2}.{gb.CpuRead("wPlayTimeFrames"):d2} {gb.CpuRead("hRandomAdd"):x2}{gb.CpuRead("hRandomSub"):x2}");
+        });
+        new RbyIntroSequence(RbyStrat.NoPal, RbyStrat.GfSkip, RbyStrat.Hop2, RbyStrat.Title0, RbyStrat.NewGame, RbyStrat.NewGameReset, RbyStrat.GfReset, RbyStrat.GfSkip, RbyStrat.Hop0, RbyStrat.Title0, RbyStrat.NewGame).Execute(gb);
+        // Trace.WriteLine(gb.EmulatedSamples);
+        Trace.WriteLine($"{gb.EmulatedSamples} {gb.CpuRead("hRandomAdd"):x2}{gb.CpuRead("hRandomSub"):x2}");
+            // if(gb.EmulatedSamples - lasttime > 40000) System.Diagnostics.Trace.WriteLine($"{gb.CpuRead("wPlayTimeMinutes"):d2}:{gb.CpuRead("wPlayTimeSeconds"):d2}.{gb.CpuRead("wPlayTimeFrames"):d2} " + (gb.EmulatedSamples - lasttime) + " +" + (float)(gb.EmulatedSamples - lasttime - SamplesPerFrame) / SamplesPerFrame);
+            // lasttime = gb.EmulatedSamples;
+        gb.ClearText(Joypad.A);
+        gb.Press(Joypad.Down | Joypad.A);
+        gb.ClearText(Joypad.A);
+        Trace.WriteLine(gb.CpuReadBE<ushort>("wPlayerID"));
+        gb.Dispose();
+    }
+
     public static void Check()
     {
         RedCb gb = new RedCb();
@@ -17,6 +36,7 @@ class Softlock
         // gb.CallbackHandler.SetCallback(gb.SYM["VBlank"], gb => {
         //     Trace.WriteLine($"{gb.CpuRead("wPlayTimeMinutes"):d2}:{gb.CpuRead("wPlayTimeSeconds"):d2}.{gb.CpuRead("wPlayTimeFrames"):d2} {gb.CpuRead("hRandomAdd"):x2}{gb.CpuRead("hRandomSub"):x2}");
         // });
+        Trace.WriteLine(gb.EmulatedSamples);
         gb.ClearText(Joypad.A);
         gb.Press(Joypad.Down | Joypad.A);
         gb.ClearText(Joypad.A);
