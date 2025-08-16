@@ -107,12 +107,14 @@ public partial class Rby {
         int stackPointer;
 
         int clearCounter = 0;
+        uint lastInject = 0;
 
         int ret = 0;
 
         while(true && clearCounter < numTextBoxes) {
             // Hold the specified input until the joypad state is polled.
             ret = Hold(holdInput, breakpoints);
+            // System.Diagnostics.Trace.WriteLine($"{CpuRead("wPlayTimeMinutes"):d2}:{CpuRead("wPlayTimeSeconds"):d2}.{CpuRead("wPlayTimeFrames"):d2} Joypad");
 
             if(ret != SYM["Joypad"]) {
                 break;
@@ -148,19 +150,34 @@ public partial class Rby {
 
             if(cameFrom == textAddrs[0]) {
                 // If the call originated from 'PrintLetterDelay', advance a frame with the specified button to hold.
-                Inject(holdInput);
-                RunFor(1);
+                // if(EmulatedSamples / SamplesPerFrame > lastInject) {
+                    Inject(holdInput);
+                    // RunFor(1);
+                // }
+                // else RunFor(1);
+                RunUntil(SYM["_Joypad"] + 2);
+                // System.Diagnostics.Trace.WriteLine($"{CpuRead("wPlayTimeMinutes"):d2}:{CpuRead("wPlayTimeSeconds"):d2}.{CpuRead("wPlayTimeFrames"):d2} PLD:" + holdInput);
+                lastInject = CpuReadBE<uint>("wPlayTimeMaxed");
+                // lastInject = CpuReadBE<ushort>("hRandomAdd");
             } else {
                 // If the call did not originate from 'PrintLetterDelay', advance the textbox with the opposite button used in the previous frame.
-                byte previous = (byte) (CpuRead("hJoyLast") & (byte) (Joypad.A | Joypad.B));
-                Joypad advance;
-                if(previous == 0) advance = cameFrom == textAddrs[1] ? Joypad.B : Joypad.A; // If neither A or B have been pressed on the previous frame, clear the textbox with B if it's a "60 fps" textbox.
-                else advance = (Joypad) (previous ^ 0x3); // Otherwise clear with the opposite button. This is achieved by XORing the value by 3.
-                                                          // (Joypad.A) 01 xor 11 = 10 (Joypad.B)
-                                                          // (Joypad.B) 10 xor 11 = 01 (Joypad.A)
-                Inject(advance);
-                RunFor(1);
-                clearCounter++;
+                if(lastInject != CpuReadBE<uint>("wPlayTimeMaxed") || CpuReadBE<uint>("wPlayTimeMaxed") == 0) {
+                    byte previous = (byte) (CpuRead("hJoyLast") & (byte) (Joypad.A | Joypad.B));
+                    Joypad advance;
+                    if(previous == 0) advance = cameFrom == textAddrs[1] ? Joypad.B : Joypad.A; // If neither A or B have been pressed on the previous frame, clear the textbox with B if it's a "60 fps" textbox.
+                    else advance = (Joypad) (previous ^ 0x3); // Otherwise clear with the opposite button. This is achieved by XORing the value by 3.
+                                                            // (Joypad.A) 01 xor 11 = 10 (Joypad.B)
+                                                            // (Joypad.B) 10 xor 11 = 01 (Joypad.A)
+                    Inject(advance);
+                    // System.Diagnostics.Trace.WriteLine($"{(lastInject >> 16) & 0xff:d2} {(lastInject >> 8) & 0xff:d2} {lastInject & 0xff:d2} {(CpuRead("wPlayTimeFrames") + 59) % 60:d2}");
+                    // System.Diagnostics.Trace.WriteLine($"{lastInject:x4} {CpuReadBE<ushort>("hRandomAdd"):x4}");
+                    RunFor(1);
+                    clearCounter++;
+                    // RunUntil(SYM["_Joypad"] + 2);
+                    // System.Diagnostics.Trace.WriteLine($"{CpuRead("wPlayTimeMinutes"):d2}:{CpuRead("wPlayTimeSeconds"):d2}.{CpuRead("wPlayTimeFrames"):d2} Textbox " + advance);
+                    lastInject = CpuReadBE<uint>("wPlayTimeMaxed");
+                }
+                else RunFor(1);
             }
         }
 
