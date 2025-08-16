@@ -14,6 +14,11 @@ public partial class Rby {
             Inject(joypad);
             AdvanceFrame();
         }
+        // foreach(Joypad joypad in joypads) {
+        //     RunUntil("_Joypad");
+        //     Inject(joypad);
+        //     AdvanceFrame(joypad);
+        // }
     }
 
     public override int Execute(params Action[] actions) {

@@ -1,10 +1,41 @@
 using System;
 using System.IO;
+using System.Linq;
 
+public class CallbackHandler<Gb> where Gb : GameBoy
+{
+    int Address;
+    Action<Gb> Callback = null;
+    public Gb gb;
+    public CallbackHandler(Gb gb)
+    {
+        this.gb = gb;
+    }
+    public void SetCallback(int address, Action<Gb> callback)
+    {
+        Address = address;
+        Callback = callback;
+    }
+    public int Hold(Func<Joypad, int[], int> hold, Joypad joypad, params int[] addrs)
+    {
+        if(Callback != null)
+            addrs = addrs.Append(Address).ToArray();
+        int ret;
+        while((ret = hold(joypad, addrs)) == Address)
+        {
+            Callback(gb);
+            gb.RunFor(1);
+        }
+        return ret;
+    }
+}
 public partial class PokemonGame : GameBoy {
 
+    public CallbackHandler<PokemonGame> CallbackHandler;
     public PokemonGame(string rom, string savFile = null, SpeedupFlags speedupFlags = SpeedupFlags.None) : base("roms/gbc_bios.bin", rom, savFile, speedupFlags) {
+        CallbackHandler = new CallbackHandler<PokemonGame>(this);
     }
+    public unsafe override int Hold(Joypad joypad, params int[] addrs) { return CallbackHandler.Hold(base.Hold, joypad, addrs); }
 
     // Executes the specified actions and returns the last hit breakpoint.
     public virtual int Execute(params Action[] actions) {

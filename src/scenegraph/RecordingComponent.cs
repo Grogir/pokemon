@@ -12,7 +12,9 @@ public class RecordingComponent : Component {
     public RecordingComponent(string movie) {
         if(!Directory.Exists("movies")) Directory.CreateDirectory("movies");
         Movie = movie;
-        VideoStream = new FFMPEGStream("-y -f rawvideo -s " + Renderer.Window.Width + "x" + Renderer.Window.Height + " -pix_fmt rgba -r 59.7275 -i - -crf 0 movies/video.mp4");
+        // VideoStream = new FFMPEGStream("-y -f rawvideo -s " + Renderer.Window.Width + "x" + Renderer.Window.Height + " -pix_fmt rgba -r 59.7275 -i - -crf 0 movies/video.mp4");
+        VideoStream = new FFMPEGStream("-y -f rawvideo -s " + Renderer.Window.Width + "x" + Renderer.Window.Height + " -pix_fmt rgba -r 59.7275 -i - -crf 0 -vf format=yuv420p -preset ultrafast movies/video.mp4");
+        // VideoStream = new FFMPEGStream("-y -f rawvideo -s " + Renderer.Window.Width + "x" + Renderer.Window.Height + " -pix_fmt rgba -r 59.7275 -i - -c:v libx265 -x265-params crf=0 movies/video.mp4");
         AudioStream = new FFMPEGStream("-y -f s16le -ar 2097152 -ac 2 -i - -af volume=0.04 movies/audio.mp3");
         OffscreenBuffer = new byte[Renderer.Window.Width * Renderer.Window.Height * 4];
     }

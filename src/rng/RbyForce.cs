@@ -85,6 +85,13 @@ public class RbyForce : Rby {
 
     public void CacheState(string name, System.Action fn) {
         StateCacher.CacheState(this, name, fn);
+        // byte[] items = CpuRead("wNumBagItems", SYM["wRivalName"] - SYM["wNumBagItems"]);
+        // byte[] party = CpuRead("wPartyDataStart", SYM["wPartyDataEnd"] - SYM["wPartyDataStart"]);
+        // byte[] data = CpuRead("wPartyDataStart", SYM["wRivalName"] - SYM["wPartyDataStart"]);
+        // LoadState("rng-cache/checkpoints/" + name + ".gqs");
+        // CpuWrite("wNumBagItems", items);
+        // CpuWrite("wPartyDataStart", party);
+        // CpuWrite("wPartyDataStart", data);
     }
 
     public void ClearCache() {
@@ -158,7 +165,7 @@ public class RbyForce : Rby {
             Inject(Joypad.A);
         }
 
-        if(!(EnemyMon.StoringEnergy | EnemyMon.ChargingUp | EnemyMon.UsingRage | EnemyMon.Frozen | EnemyMon.UsingTrappingMove)) {
+        if(!(EnemyMon.StoringEnergy | EnemyMon.ChargingUp | EnemyMon.UsingRage | EnemyMon.Frozen | EnemyMon.UsingTrappingMove | EnemyMon.ThrashingAbout | EnemyMon.Asleep)) {
             Hold(Joypad.A, SYM["SelectEnemyMove.done"]);
             A = enemyTurn != null && enemyTurn.Move != "" ? Moves[enemyTurn.Move].Id : 0;
         }
@@ -205,6 +212,7 @@ public class RbyForce : Rby {
         int enemyTurnDone1 = SYM["MainInBattleLoop.enemyMovesFirst"] + 0x11;
         int enemyTurnDone2 = SYM["MainInBattleLoop.playerMovesFirst"] + 0x27;
         int enemyTurnDone3 = SYM["HandleEnemyMonFainted"];
+        int enemyTurnDone4 = SYM["MainInBattleLoop.AIActionUsedPlayerFirst"];
 
         int ret;
         Joypad holdButton = Joypad.None;
@@ -218,9 +226,9 @@ public class RbyForce : Rby {
             "FlinchSideEffect"
         };
 
-        while((ret = ClearTextUntil(holdButton, random, playerTurnDone1, playerTurnDone2, playerTurnDone3, enemyTurnDone1, enemyTurnDone2, enemyTurnDone3)) == random) {
+        while((ret = ClearTextUntil(holdButton, random, playerTurnDone1, playerTurnDone2, playerTurnDone3, enemyTurnDone1, enemyTurnDone2, enemyTurnDone3, enemyTurnDone4)) == random) {
             int addr = CpuReadLE<ushort>(SP);
-            if(addr > 0x4000) addr |= CpuRead("hLoadedROMBank") << 16;
+            if(addr >= 0x4000) addr |= CpuRead("hLoadedROMBank") << 16;
             string address = SYM[addr];
             RunUntil(addr);
             if(!address.StartsWith("VBlank")) {
@@ -239,8 +247,9 @@ public class RbyForce : Rby {
                 } else if(sideEffects.Any(effect => address.StartsWith(effect))) { // various side effects
                     A = (turn.Flags & SideEffect) > 0 ? 0x00 : 0xff;
                 } else if(address.StartsWith("TrainerAI")) {  // trainer ai
-                    if((turn.Flags & AiItem) > 0) { A = 0x00; break; } else A = 0xff;
-                } else if(address.StartsWith("ThrashPetalDanceEffect")) {  // thresh/petal dance length
+                    if((turn.Flags & AiItem) > 0) { A = turn.Flags / Turns; break; } else A = 0xff;
+                    // A = (turn.Flags & AiItem) > 0 ? 0x00 : 0xff;
+                } else if(address.StartsWith("ThrashPetalDanceEffect")) {  // thrash/petal dance length
                     A = (turn.Flags & ThreeTurn) > 0 ? 0 : 1;
                 } else if(address.StartsWith("CheckPlayerStatusConditions.IsConfused") || address.StartsWith("CheckEnemyStatusConditions.IsConfused")) {  // confusion hit through
                     A = (turn.Flags & Hitself) > 0 ? 0xff : 0x00;
@@ -253,9 +262,12 @@ public class RbyForce : Rby {
                 } else if(address.StartsWith("DisableEffect.playerTurnNotLinkBattle")) { // disable number of turns (1-8)
                     int turns = turn.Flags / Turns;
                     A = ((turns >= 1 ? turns : 8) - 1) & 0x7;
+                } else if(address.StartsWith("SleepEffect.setSleepCounter")) { // sleep number of turns (1-7)
+                    int turns = turn.Flags / Turns;
+                    A = (turns >= 1 ? turns : 7) & 0x7;
                 } else if(address.StartsWith("BideEffect.bideEffect")) { // bide number of turns (2-3)
                     int turns = turn.Flags / Turns;
-                    A = ((turns >= 2 ? turns : 3) - 2) & 0x7;
+                    A = ((turns >= 2 ? turns : 3) - 2) & 0x1;
                 } else if(address == "TrappingEffect.trappingEffect+000b" || address == "TwoToFiveAttacksEffect.setNumberOfHits+000e") { // not needed
                     A = 0x3;
                 } else if(address == "TrappingEffect.trappingEffect+0014" || address == "TwoToFiveAttacksEffect.setNumberOfHits+0017") { // multi-attack number of hits (2-5)
@@ -1118,6 +1130,7 @@ public class RbyForce : Rby {
                 CpuWrite(SYM["wSpritePlayerStateData2MovementDelay"] + offset, 1);
             }
         } else {
+            // System.Diagnostics.Trace.WriteLine("block npc " + npc);
             // block movement
             D = 0;
             E = 0;
@@ -1125,6 +1138,7 @@ public class RbyForce : Rby {
             F |= 0x10;
             CpuWrite(SYM["wSpritePlayerStateData1MovementStatus"] + offset, 2);
             CpuWrite(SYM["wSpritePlayerStateData2MovementByte1"] + offset, (byte) RbySpriteMovement.Stay);
+            CpuWrite(SYM["wSpritePlayerStateData2MovementDelay"] + offset, 255);
         }
     }
 }
