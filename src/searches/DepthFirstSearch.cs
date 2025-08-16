@@ -115,6 +115,7 @@ public static class DepthFirstSearch {
                     if(ret != gb.OverworldLoopAddress) {
                         if(ret == gb.WildEncounterAddress)
                             igt.Success = parameters.EncounterCallback != null ? parameters.EncounterCallback(gb) : false;
+                        // else Console.WriteLine("movement failed on frame " + f);
                         igt.Running = false;
                     }
                 } else {
@@ -122,6 +123,15 @@ public static class DepthFirstSearch {
                 }
                 results[f] = igt;
             });
+
+            // for(int i = 0; i < results.Length; ++i) // clusters
+            // {
+            //     if(!results[i].Running)
+            //         for(int n = 2; n <= parameters.SuccessSS; ++n)
+            //             if(!results[(i + n) % results.Length].Running)
+            //                 for(int j = i + 1; j < i + n; ++j)
+            //                     results[j % results.Length].Running = false;
+            // }
 
             DFState<M, T> newState = new DFState<M, T>() {
                 Tile = edge.NextTile,

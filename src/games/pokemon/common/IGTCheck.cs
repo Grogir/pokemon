@@ -120,7 +120,7 @@ public class IGTResults {
 
     public IGTResults Purge(bool success = false)
     {
-        IGTResults ret = new IGTResults(TotalSuccesses);
+        IGTResults ret = new IGTResults(success ? TotalFailures : TotalSuccesses);
         for(int i = 0, j = 0; i < Length; ++i) if(IGTs[i].Success != success) ret[j++] = IGTs[i];
         return ret;
     }

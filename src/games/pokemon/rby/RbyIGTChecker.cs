@@ -14,7 +14,7 @@ public static class RbyIGTChecker<Gb> where Gb : Rby {
         public bool Yoloball;
 
         public string ToString(bool dvs = false, bool yb = true) {
-            return $"[{IGTSec}] [{IGTFrame}]: " + (Mon != null ? (dvs ? Mon.ToString() : $"L{Mon.Level} {Mon.Species.Name}")+$" on {Tile}" + (yb ? $", Yoloball: {Yoloball}" : "") : "");
+            return $"[{IGTSec}][{IGTFrame:D2}]: " + (Mon != null ? (dvs ? Mon.ToString() : $"L{Mon.Level} {Mon.Species.Name}") + $" on {Tile}" + (yb ? $", Yoloball: {Yoloball}" : "") : "");
         }
         public byte IGTSec;
         public byte IGTFrame;
@@ -27,7 +27,7 @@ public static class RbyIGTChecker<Gb> where Gb : Rby {
 
     public static int CheckIGT(string statePath, RbyIntroSequence intro, string path, string targetPoke = null, int numFrames = 60, bool checkDV = false,
                                 bool selectBall = false, Verbosity verbose = Verbosity.Full, bool forceRedBar = false, int nameLength = -1, Func<Gb, bool> memeBall = null,
-                                int startFrame = 0, int minutes = 1, int numThreads = 16, List<(int, byte, byte)> itemPickups = null, List<IGTResult> fullResults = null) {
+                                int startFrame = 0, int seconds = 1, int numThreads = 16, List<(int, byte, byte)> itemPickups = null, List<IGTResult> fullResults = null) {
         byte[] state = File.ReadAllBytes(statePath);
 
         if(gbs == null || gbs.Length != numThreads) gbs = MultiThread.MakeThreads<Gb>(numThreads);
@@ -42,7 +42,7 @@ public static class RbyIGTChecker<Gb> where Gb : Rby {
 
         List<IGTResult> manipResults = fullResults != null ? fullResults : new List<IGTResult>();
         Dictionary<string, int> manipSummary = new Dictionary<string, int>();
-        int totalNumFrames = numFrames * minutes;
+        int totalNumFrames = numFrames * seconds;
 
         MultiThread.For(totalNumFrames, gbs, (gb, iterator) => {
             IGTResult res = new IGTResult();
@@ -88,7 +88,7 @@ public static class RbyIGTChecker<Gb> where Gb : Rby {
             }
 
             if(ret == gb.WildEncounterAddress) {
-                res.Yoloball = memeBall != null ? memeBall(gb) : selectBall ? gb.Selectball() : gb.Yoloball();
+                res.Yoloball = memeBall != null ? memeBall(gb) : selectBall ? gb.Selectball() : gb.Yoloball(0);
                 res.Mon = gb.EnemyMon;
             }
             res.Tile = gb.Tile != null ? gb.Tile : new RbyTile() { Map = gb.Map, X = gb.XCoord, Y = gb.YCoord };
@@ -156,14 +156,14 @@ public static class RbyIGTChecker<Gb> where Gb : Rby {
         public int NameLength = -1;
         public Func<Gb, bool> MemeBall = null;
         public int StartFrame = 0;
-        public int Minutes = 1;
+        public int Seconds = 1;
         public int NumThreads = 16;
         public List<(int, byte, byte)> ItemPickups = null;
         public List<IGTResult> FullResults = null;
     }
 
     public static int CheckIGT(CheckIGTParameters p) {
-        return CheckIGT(p.StatePath, p.Intro, p.Path, p.TargetPoke, p.NumFrames, p.CheckDV, p.SelectBall, p.Verbose, p.ForceRedBar, p.NameLength, p.MemeBall, p.StartFrame, p.Minutes, p.NumThreads, p.ItemPickups, p.FullResults);
+        return CheckIGT(p.StatePath, p.Intro, p.Path, p.TargetPoke, p.NumFrames, p.CheckDV, p.SelectBall, p.Verbose, p.ForceRedBar, p.NameLength, p.MemeBall, p.StartFrame, p.Seconds, p.NumThreads, p.ItemPickups, p.FullResults);
     }
 
     public static string SpacePath(string path) {

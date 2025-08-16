@@ -117,6 +117,8 @@ class SearchCommon
         }
         gb.RunUntil("DisableLCD");
         gb.Scene.RemoveComponent(g);
+        gb.Yoloball();
+        gb.ClearText(1);
         gb.AdvanceFrames(250);
         gb.Dispose();
         FFMPEG.RunFFMPEGCommand("-i movies/1.mp4 -vf scale=800x720:flags=neighbor -y movies/" + name + ".mp4");
@@ -160,7 +162,7 @@ class SearchCommon
         { 35, (230, 0) },
         { 36, (250, 0) },
     };
-    public static string Link(RbyTile tile, string path, bool local = false)
+    public static RbyTile EndTile(RbyTile tile, string path)
     {
         Action[] actions = ActionFunctions.PathToActions(RbyIGTChecker<Red>.SpacePath(path));
         var warp = tile.WarpCheck();
@@ -176,11 +178,152 @@ class SearchCommon
                 warp = tile.WarpCheck();
             }
         }
+        return tile;
+    }
+    public static string Link(RbyTile tile, string path, bool local = false)
+    {
+        tile = EndTile(tile, path);
         if(!local && LocalToMap.ContainsKey(tile.Map.Id)) {
             var coord = LocalToMap[tile.Map.Id];
             return "https://gunnermaniac.com/pokeworld?map=1#" + (tile.X + coord.X) + "/" + (tile.Y + coord.Y) + "/";
         }
         return tile.PokeworldLink + "/";
+    }
+
+    // public static string LogTurn<Gb>(Gb gb) where Gb : Rby
+    public static string LogTurn(Rby gb)
+    {
+        byte move;
+        int addr;
+        string info = "";
+        if(gb.BattleMon.HP == 0)
+        {
+            info += "DEAD";
+        }
+        else if(gb.Hold(Joypad.A, "MainInBattleLoop.enemyMovesFirst", "MainInBattleLoop.playerMovesFirst") == gb.SYM["MainInBattleLoop.enemyMovesFirst"])
+        {
+            addr = gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.enemyMovesFirst"] + 0x11);
+            move = gb.CpuRead(gb.SYM["wEnemySelectedMove"]);
+            if(move > 0) info += " " + gb.Moves[move].Name;
+            if(addr == gb.SYM["MoveMissed"] || gb.CpuRead("wMoveMissed") != 0) info += " Miss";
+            if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
+            if(gb.ClearText(Joypad.A, 99, gb.SYM["ExecutePlayerMove"], gb.SYM["HandlePlayerMonFainted"]) == gb.SYM["ExecutePlayerMove"])
+            {
+                move = gb.CpuRead(gb.SYM["wPlayerSelectedMove"]);
+                if(move > 0) info += ", " + gb.Moves[move].Name;
+                gb.Hold(Joypad.B, gb.SYM["PlayerCanExecuteMove"] + 0x3);
+                addr = gb.Hold(Joypad.A, gb.SYM["PrintMoveFailureText"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.AIActionUsedEnemyFirst"] + 0xC);
+                if(addr == gb.SYM["PrintMoveFailureText"]) info += " Miss";
+                if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
+            }
+        }
+        else
+        {
+            addr = gb.Hold(Joypad.A, gb.SYM["PrintMoveFailureText"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.playerMovesFirst"] + 0x3);
+            move = gb.CpuRead(gb.SYM["wPlayerSelectedMove"]);
+            if(move > 0) info += " " + gb.Moves[move].Name;
+            if(addr == gb.SYM["PrintMoveFailureText"]) info += " Miss";
+            if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
+            if(gb.ClearText(Joypad.A, 99, gb.SYM["ExecuteEnemyMove"], gb.SYM["HandleEnemyMonFainted"]) == gb.SYM["ExecuteEnemyMove"])
+            {
+                move = gb.CpuRead(gb.SYM["wEnemySelectedMove"]);
+                if(move > 0) info += ", " + gb.Moves[move].Name;
+                gb.Hold(Joypad.B, gb.SYM["EnemyCanExecuteMove"] + 0x7);
+                addr = gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.playerMovesFirst"] + 0x27);
+                if(addr == gb.SYM["MoveMissed"] || gb.CpuRead("wMoveMissed") != 0) info += " Miss";
+                if(gb.CpuRead(gb.SYM["wCriticalHitOrOHKO"]) > 0) info += " Crit";
+            }
+        }
+        info += " [HP:" + gb.BattleMon.HP + ";" + gb.EnemyMon.HP + "]";
+        if(gb.BattleMon.Poisoned) info += " ***PSN***";
+        return info;
+    }
+    public static void DoTurn(Rby gb)
+    {
+        if(gb.BattleMon.HP == 0) return;
+        if(gb.Hold(Joypad.A, "MainInBattleLoop.enemyMovesFirst", "MainInBattleLoop.playerMovesFirst") == gb.SYM["MainInBattleLoop.enemyMovesFirst"])
+        {
+            gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.enemyMovesFirst"] + 0x11);
+            if(gb.ClearText(Joypad.A, 99, gb.SYM["ExecutePlayerMove"], gb.SYM["HandlePlayerMonFainted"]) == gb.SYM["ExecutePlayerMove"])
+            {
+                gb.Hold(Joypad.B, gb.SYM["PlayerCanExecuteMove"] + 0x3);
+                gb.Hold(Joypad.A, gb.SYM["PrintMoveFailureText"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.AIActionUsedEnemyFirst"] + 0xC);
+            }
+        }
+        else
+        {
+            gb.Hold(Joypad.A, gb.SYM["PrintMoveFailureText"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.playerMovesFirst"] + 0x3);
+            if(gb.ClearText(Joypad.A, 99, gb.SYM["ExecuteEnemyMove"], gb.SYM["HandleEnemyMonFainted"]) == gb.SYM["ExecuteEnemyMove"])
+            {
+                gb.Hold(Joypad.B, gb.SYM["EnemyCanExecuteMove"] + 0x7);
+                gb.Hold(Joypad.A, gb.SYM["MoveMissed"], gb.SYM["ManualTextScroll"], gb.SYM["MainInBattleLoop.playerMovesFirst"] + 0x27);
+            }
+        }
+    }
+
+    public static void FindYoloball(Rby gb, System.Action<string, bool> result)
+    {
+        void Backout(int type)
+        {
+            if(type == 1) gb.Press(Joypad.B | Joypad.Right, Joypad.A); // item
+            else if(type == 2) gb.Press(Joypad.Select, Joypad.B, Joypad.A); // select item
+            else if(type == 3) gb.Press(Joypad.A | Joypad.Up, Joypad.B); // potion
+            else if(type == 4) gb.Press(Joypad.Select, Joypad.A | Joypad.Up, Joypad.B); // select potion
+        }
+        string Info(int type)
+        {
+            if(type == 1) return "i  ";
+            else if(type == 2) return "si ";
+            else if(type == 3) return "p  ";
+            else if(type == 4) return "sp ";
+            else if(type == 10) return "b  ";
+            else if(type == 11) return "sb ";
+            return "";
+        }
+
+        byte[] ballstate = gb.SaveState();
+        for(int backout1 = 0; backout1 <= 4; ++backout1)
+        {
+            for(int backout2 = 0; backout2 <= 4; ++backout2)
+            {
+                if(backout2 == 0 && backout1 != 0) continue;
+                for(int ballthrow = 10; ballthrow <= 11; ++ballthrow)
+                {
+                    gb.LoadState(ballstate);
+                    Backout(backout1);
+                    Backout(backout2);
+                    gb.RunUntil("HandleMenuInput_.getJoypadState");
+                    if(ballthrow == 11) gb.Press(Joypad.Select);
+                    gb.Press(Joypad.A | (gb.CpuRead("wCurrentMenuItem") == 0 ? Joypad.Down | Joypad.Left : Joypad.Left));
+                    bool success = gb.Hold(Joypad.A, "ItemUseBall.captured", "ItemUseBall.failedToCapture") == gb.SYM["ItemUseBall.captured"];
+                    result(Info(backout1) + Info(backout2) + Info(ballthrow), success);
+                }
+            }
+        }
+    }
+
+    public static IGTResults AdvanceStates(IGTResults igt)
+    {
+        IGTResults r = new IGTResults(igt.Length);
+        Blue gb = new Blue();
+        for(int i = 0; i < igt.Length; ++i)
+        {
+            gb.LoadState(igt[i].State);
+            gb.AdvanceFrame();
+            r[i] = new IGTState(gb, igt[i].Success, igt[i].IGTStamp);
+        }
+        return r;
+    }
+    public static void RNGDebug(IGTResults igt)
+    {
+        IGTResults r = AdvanceStates(igt);
+        for(int i = 0; i < r.Length; ++i) System.Diagnostics.Trace.WriteLine(r[i].IGTFrame + " " + r[i].HRA + " " + r[i].HRS + " " + r[i].Divider + " " + r[i].Dsum);
+        System.Diagnostics.Trace.WriteLine(r.TotalSuccesses + "/60 " + RNGSummary(r, false));
+    }
+    public static string RNGSummary(IGTResults igt, bool advance = true)
+    {
+        IGTResults r = advance ? AdvanceStates(igt) : igt;
+        return "[" + r.RDivSuccesses() + "] " + r.RNGSuccesses(0) + "-" + r.RNGSuccesses(1) + "-" + r.RNGSuccesses(2) + "--" + r.RNGSuccesses(3) + "-" + r.RNGSuccesses(4) + "-" + r.RNGSuccesses(5);
     }
 }
 

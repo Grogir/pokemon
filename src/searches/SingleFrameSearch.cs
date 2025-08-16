@@ -96,7 +96,7 @@ public static class SingleFrameSearch {
                                                                                                                                              where M : Map<M, T>
                                                                                                                                              where T : Tile<M, T> {
 
-        if(parameters.EndTiles != null && state.EdgeSet == parameters.EndEdgeSet && parameters.EndTiles.Any(t => t.X == state.Tile.X && t.Y == state.Tile.Y)) {
+        if(parameters.EndTiles != null && state.EdgeSet == parameters.EndEdgeSet && parameters.EndTiles.Any(t => t.X == state.Tile.X && t.Y == state.Tile.Y && t.Map.Id == state.Tile.Map.Id)) {
             if(parameters.EncounterCallback == null)
                 parameters.FoundCallback(state, gb);
             return;
@@ -122,14 +122,15 @@ public static class SingleFrameSearch {
 
             gb.LoadState(state.IGT.State);
             int ret = gb.Execute(edge.Action);
+
+            if(parameters.TileCallback.Tile != null && ret == gb.OverworldLoopAddress && edge.NextTile == parameters.TileCallback.Tile)
+                parameters.TileCallback.Callback(gb);
+
             newState.IGT = new IGTState(gb, state.IGT.Success, state.IGT.IGTStamp);
 
-            if(ret == gb.OverworldLoopAddress) {
-                if(edge.NextTile == parameters.TileCallback.Tile)
-                    parameters.TileCallback.Callback(gb);
-            } else {
+            if(ret != gb.OverworldLoopAddress) {
                 if(ret == gb.WildEncounterAddress)
-                    if(parameters.EncounterCallback(gb))
+                    if(parameters.EncounterCallback != null && parameters.EncounterCallback(gb))
                         parameters.FoundCallback(newState, gb);
                 continue;
             }
